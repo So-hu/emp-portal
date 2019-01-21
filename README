@@ -1,1 +1,6 @@
-sigh
+Two package.json folders for dependencies, client and server.
+
+'npm run client'
+'npm run server'
+use two different terminals, currently runs on port 3000 and 5000.
+
