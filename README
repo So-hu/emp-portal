@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 Two package.json folders for dependencies, client and server.
 
 'npm run client'
 'npm run server'
 use two different terminals, currently runs on port 3000 and 5000.
 
+=======
+Two package.json folders for dependencies, client and server. Will soon add a dependencies script to make start up easier, make sure to update when adding new dependencies.
+
+'npm run client'
+'npm run server'
+on two different terminals to start site, currently runs on port 3000 and 5000.
+
+>>>>>>> e13d68c0956d5d3a4ef8211c63dae1757031a503
