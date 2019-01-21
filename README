@@ -4,3 +4,4 @@ use commands:
 'npm run server'
 while in the root directory on two different terminals, currently runs on port 3000 and 5000.
 
+Test
