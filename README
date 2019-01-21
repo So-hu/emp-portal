@@ -1,1 +1,6 @@
-sigh
+Two package.json folders for dependencies, client and server. Will soon add a dependencies script to make start up easier, make sure to update when adding new dependencies.
+
+'npm run client'
+'npm run server'
+on two different terminals to start site, currently runs on port 3000 and 5000.
+
