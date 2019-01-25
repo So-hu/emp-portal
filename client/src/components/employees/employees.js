@@ -14,15 +14,15 @@ class Employees extends Component {
   }
 
   componentDidMount(){
-    fetch('/employees') //uses the proxy to send request to server for data
+    this.setState({ mounted: true })
+    fetch('/employeeData') //uses the proxy to send request to server for data
       .then(res => res.json())
       .then(
         employees => this.setState({isLoaded: true, employees}, () => console.log('Employees fetched..', employees)),
         error => {
           this.setState({isLoaded:true, error});
         }
-      );
-
+      );   
   }
 
   //placeholder function call for employee table
