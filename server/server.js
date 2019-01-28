@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 var port = 5000;
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
 /*
 //server connection placeholder
 const mysql = require('mysql');
@@ -23,7 +26,7 @@ app.get('/', function(req, res){
 });
 
 //example server side route function for data fetching
-app.get('/employees', function(req, res){
+app.get('/employeeData', function(req, res){
     //hard coded data, replace with DB query
     const employees = [
         {id: 1, name: 'aaron'},
@@ -31,6 +34,15 @@ app.get('/employees', function(req, res){
         {id: 3, name: 'carter'}
     ];
     res.json(employees);
+});
+
+app.post('/userAuth', function(req, res){
+    const {user, password} = req.body;
+    var result = {valid: false}
+    if((user === 'admin') && (password === '123')){
+        result.valid = true
+    }
+    res.json(result);
 });
 
 app.listen(port, function(){
