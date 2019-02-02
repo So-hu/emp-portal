@@ -9,7 +9,6 @@ import Route from "react-router-dom/Route";
 class App extends Component {
   constructor(props) {
     super(props);
-    //todo:initialized the authenticated state here. Will be passed to routes to track state
     this.state = {
       isAuthenticated: false,
       role: "admin" //TODO: implement a better way to store user role

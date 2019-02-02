@@ -17,7 +17,7 @@ class Login extends Component {
 
     //input validator, returns an object with two members, error and isValid
     isValidInput = (user, password) => {
-        var res = true;
+        var res = true;     
         var errors = {};
         if(user.length === 0){
             res = false;
@@ -62,7 +62,7 @@ class Login extends Component {
         })
         .then(res => res.json())
         .then(
-            data => this.setState({'redirect': data.valid, 'errors': {login:'Invalid Crendentials'}}),
+            data => this.setState({'redirect': data.valid, 'errors': {login: data.msg}}),
             error => {this.setState({errors: error})}
         )
     }
