@@ -23,7 +23,7 @@ class Navbar extends Component {
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
+          <ul class="navbar-nav">
             {this.props.routes.map(r => (
               <li class="nav-item">
                 <NavLink
@@ -36,6 +36,19 @@ class Navbar extends Component {
               </li>
             ))}
           </ul>
+        </div>
+        <div class="pull-right">
+          <ul class="navbar-nav">
+              <li class="nav-item">
+                <NavLink
+                  to="/logout"
+                  className="nav-link"
+                  activeClassName="active"
+                >
+                  Log Out
+                </NavLink>
+              </li>
+            </ul>
         </div>
       </nav>
     );

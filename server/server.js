@@ -39,9 +39,14 @@ app.get('/employeeData', function(req, res){
 //this function will need to return whether the login is valid as well as the userclass.
 app.post('/userAuth', function(req, res){
     const {user, password} = req.body;
-    var result = {valid: false, msg:''}
+    var result = {valid: false, role:'', msg:''}
     if((user === 'admin') && (password === '123')){
         result.valid = true
+        result.role = 'administrator'
+    }
+    else if((user === 'joe') && (password === 'schmoe')){
+        result.valid = true
+        result.role = 'user'
     }
     else{
         result.msg = 'Username and password do not match'
