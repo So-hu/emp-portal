@@ -1,0 +1,13 @@
+.Login {
+    padding: 60px 0;
+}
+  
+.Login form {
+    margin: 0 auto;
+    width: 20%;
+}
+
+.Login label {
+    font-weight:bold;
+    font-size:large;
+}

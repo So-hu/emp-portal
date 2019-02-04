@@ -1,5 +1,8 @@
 import React, { Component } from "react";
-import { Redirect } from 'react-router'
+import store from '../store/store';
+import {logIn} from '../store/actions';
+import { Redirect} from 'react-router-dom';
+import './login.css'
 
 class Login extends Component {
     constructor(props) {
@@ -7,6 +10,7 @@ class Login extends Component {
       this.state = {//store values in state and use for auth
         user: '',
         password: '',
+        userClass: '',
         errors: {},
         redirect: false
       };
@@ -17,7 +21,7 @@ class Login extends Component {
 
     //input validator, returns an object with two members, error and isValid
     isValidInput = (user, password) => {
-        var res = true;
+        var res = true;     
         var errors = {};
         if(user.length === 0){
             res = false;
@@ -39,17 +43,16 @@ class Login extends Component {
 
     handleSubmit = event => {
         event.preventDefault();
-        var valid = false
         const {user, password} = this.state;
         var {errors, isValid } = this.isValidInput(user, password);
-        console.log(isValid)
         if(!isValid){//if the input is invalid, set the errors state with the error object returned from isValidInput
             this.setState({errors});
             return;
         }
         //valid input, proceed with server call.
         this.setState({errors: {}})
-        console.log('verified, calling server')
+        //save the context for later use
+        let self = this;
         fetch('/userAuth',{
             method: 'POST',
             headers:{
@@ -60,24 +63,35 @@ class Login extends Component {
                 'password': password,
             })
         })
-        .then(res => res.json())
+        .then(res => {
+            return res.json()
+        })
         .then(
-            data => this.setState({'redirect': data.valid, 'errors': {login:'Invalid Crendentials'}}),
-            error => {this.setState({errors: error})}
+            function(data){
+                //can't use 'this' here due to context loss in promise
+                self.setState({'redirect': data.valid,'userClass': data.role, 'errors': {login: data.msg}})
+                if(data.valid === true){
+                    store.dispatch(logIn(data.role)) 
+                }
+            }
         )
     }
-    
+
+    login = () => {
+        store.dispatch(logIn())
+    }
+  
     render(){
-        const { user, password, errors, redirect } = this.state;
-        
-        if(redirect === true){
-            window.location = "http://localhost:3000/employees"
+        const { errors } = this.state;
+        if(this.state.redirect === true){
+            return <Redirect to='/homepage'/>
         }
 
         return(
+        <div className="Login">
             <form onSubmit={this.handleSubmit}>
-            <div className="alert alert-danger">{errors.login}</div>
-                <label>Username</label>
+            <div>{errors.login}</div>
+                <label class="label">Username</label><br></br>
                     <input 
                         name= "user"
                         placeholder = "Email Address" 
@@ -86,8 +100,8 @@ class Login extends Component {
                         onChange={this.handleChange}
                     />
                 <br></br>
-                <div className="alert alert-danger">{errors.user}</div>
-                <label>Password</label>
+                <div>{errors.user}</div>
+                <label class="label">Password</label><br></br>
                     <input 
                         name = "password"
                         placeholder = "Enter Password" 
@@ -96,9 +110,10 @@ class Login extends Component {
                         onChange={this.handleChange}
                     />
                 <br></br>
-                <div className="alert alert-danger">{errors.password}</div>
+                <div>{errors.password}</div>
                 <button>Login</button>
             </form>
+        </div>
         );
     }
 }
