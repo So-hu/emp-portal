@@ -4,7 +4,9 @@ import Employees from "./components/employees/employees";
 import LogOutPage from "./components/LogOutPage";
 import Login from "./pages/login";
 import Navbar from "./components/navbar/navbar";
-import Piechart from "./components/charts/piechart"
+import Piechart from "./components/charts/piechart";
+import Barchart from "./components/charts/barchart";
+import Awardstable from "./components/tables/awardstable"
 import { BrowserRouter as Router, Redirect} from "react-router-dom";
 import Route from "react-router-dom/Route";
 import store from "./store/store";
@@ -59,8 +61,26 @@ class App extends Component {
             render={() => {
               return (
                 <div>
-                  <h2>Landing page</h2>
-                  <Piechart />
+                  <h5>Dashboard</h5>
+                  <div className= "grid-container">
+                    <div className= 'light-blue-border'>
+                      <Piechart />
+                    </div>
+                    <div className= 'light-blue-border'>
+                      <Barchart />
+                    </div>
+                    <div className= 'light-blue-border'>
+                      <Awardstable 
+                        columns = {['ID', 'Name', 'Award Class']} 
+                        rows = {[
+                          {ID: 1, Name: "David Smith", "Award Class": 'Employee of the Month'},
+                          {ID: 2, Name: "Adrian Romero", "Award Class": 'Employee of the Week'},
+                          {ID: 3, Name: "Ashley Mack", "Award Class": 'Employee of the Week'},
+                          {ID: 4, Name: "Ally Hsu", "Award Class": 'Employee of the Month'},
+                          {ID: 5, Name: "Edwin Rubio", "Award Class": 'Employee of the Month'}
+                          ]}/>
+                    </div>
+                  </div>
                 </div>
               );
             }}
