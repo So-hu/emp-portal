@@ -4,10 +4,10 @@ import { Chart } from "react-google-charts";
 class Piechart extends Component{
   render(){
     return(
-      <div className="chart">
+      <div className="Piechart">
       <Chart
-		  width={'1000px'}
-		  height={'1000px'}
+		  width={'600px'}
+		  height={'400px'}
 		  chartType="PieChart"
 		  loader={<div>Loading Chart</div>}
 		  data={[
@@ -18,7 +18,7 @@ class Piechart extends Component{
 		  options={{
 		    title: 'Awards Given',
 		    // Just add this option
-		    pieHole: 0.6,
+		    pieHole: 0.5,
 		  }}
 		  rootProps={{ 'data-testid': '3' }}
 		/>
