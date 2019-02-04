@@ -4,6 +4,7 @@ import Employees from "./components/employees/employees";
 import LogOutPage from "./components/LogOutPage";
 import Login from "./pages/login";
 import Navbar from "./components/navbar/navbar";
+import Piechart from "./components/charts/piechart"
 import { BrowserRouter as Router, Redirect} from "react-router-dom";
 import Route from "react-router-dom/Route";
 import store from "./store/store";
@@ -59,6 +60,7 @@ class App extends Component {
               return (
                 <div>
                   <h2>Landing page</h2>
+                  <Piechart />
                 </div>
               );
             }}
