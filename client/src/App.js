@@ -6,7 +6,8 @@ import Login from "./pages/login";
 import Navbar from "./components/navbar/navbar";
 import Piechart from "./components/charts/piechart";
 import Barchart from "./components/charts/barchart";
-import Awardstable from "./components/tables/awardstable"
+import Awardstable from "./components/tables/awardstable";
+import CreateAwardForm from "./components/awards/newAward";
 import { BrowserRouter as Router, Redirect} from "react-router-dom";
 import Route from "react-router-dom/Route";
 import store from "./store/store";
@@ -84,6 +85,9 @@ class App extends Component {
                           {ID: 4, Name: "Ally Hsu", "Award Class": 'Employee of the Month'},
                           {ID: 5, Name: "Edwin Rubio", "Award Class": 'Employee of the Month'}
                           ]}/>
+                    </div>
+                    <div className= 'light-blue-border'>
+                      <CreateAwardForm />
                     </div>
                   </div>
                 </div>
