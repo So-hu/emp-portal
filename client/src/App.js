@@ -8,6 +8,7 @@ import Piechart from "./components/charts/piechart"
 import { BrowserRouter as Router, Redirect} from "react-router-dom";
 import Route from "react-router-dom/Route";
 import store from "./store/store";
+import AdminConsole from "./components/admin/newUser";
 
 class App extends Component {
   constructor(props) {
@@ -28,7 +29,7 @@ class App extends Component {
         }
         else if(store.getState().userClass === "administrator"){
           this.setState({
-            routes: [{ route: "/homepage", name: "Home" }, { route: "/admin", name: "Admin Console"}]
+            routes: [{ route: "/homepage", name: "Home" }, { route: "/admin+console", name: "Admin Console"}]
           })
         }
         else{
@@ -49,6 +50,10 @@ class App extends Component {
           <Route path="/" exact strict component={Login}/>
           {this.state.loggedIn ?
             <Route path="/employees" strict component={Employees}/>
+            : <Redirect to='/'/>
+          }
+          {this.state.loggedIn ?
+            <Route path="/admin+console" strict component={AdminConsole}/>
             : <Redirect to='/'/>
           }
           {this.state.loggedIn ?

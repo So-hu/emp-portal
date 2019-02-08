@@ -37,6 +37,29 @@ app.get('/employeeData', function(req, res){
     })
 });
 
+app.post('/admin/addUser', function(req, res){
+    var msg = ''
+    conn.query("SELECT COUNT(*) as cnt FROM user WHERE email = ?" , 
+    [req.body.email] , function(err , data){
+       if(err){
+           msg = err;
+       }   
+       else{
+            conn.query("INSERT INTO user (userClass, firstName, lastName, email, password) VALUES(?,?,?,?,?)", 
+            [req.body.userClass, req.body.firstName, req.body.lastName, req.body.user, req.body.password], function(err){
+                if(err){
+                    msg = 'Email Already in Use';
+                    res.send(msg)
+                }
+                else{
+                    msg = 'Successfully Added User';
+                    res.send(msg)
+                }
+            })            
+           }
+    })
+});
+
 //this function will need to return whether the login is valid as well as the userclass.
 app.post('/userAuth', function(req, res){
     const {user, password} = req.body;
