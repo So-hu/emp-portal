@@ -1,39 +1,40 @@
 const express = require('express');
 const app = express();
 var port = 5000;
-
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-/*
+
 //server connection placeholder
 const mysql = require('mysql');
-const conn = mysql.createconnection({
-    host: 'hostname',
-    user: 'username',
-    password: 'password',
-    database: 'database'
+var conn = mysql.createConnection({
+    host: 'awardrecognition.cmi3nkb4cxej.us-east-1.rds.amazonaws.com',
+    port: '3306',
+    user: 'zibalteam',
+    password: 'zibalteam19',
+    database: 'awardrecognition'
 });
 
-connection.connect(err, function{
-    if(err) {
-        return err;
-    }
+conn.connect(function(err){
+    if (err) {
+        console.error('error connecting: ' + err.stack);
+        return;
+      }
+    console.log('connected')
 });
-*/
+
 app.get('/', function(req, res){
     res.send('this is the express backend homepage');
 });
 
 //example server side route function for data fetching
 app.get('/employeeData', function(req, res){
-    //hard coded data, replace with DB query
-    const employees = [
-        {id: 1, name: 'aaron'},
-        {id: 2, name: 'bob'},
-        {id: 3, name: 'carter'}
-    ];
-    res.json(employees);
+    conn.query('select lastName, firstName, email, accountCreated from user ORDER BY lastName', function(err, result){
+        if (err) {console.log(err)}
+        else{
+            res.json(result);
+        }
+    })
 });
 
 //this function will need to return whether the login is valid as well as the userclass.
