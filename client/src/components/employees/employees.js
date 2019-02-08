@@ -42,15 +42,26 @@ class Employees extends Component {
     }
     return (
       <div>
-        <header>
-          This is employee component 
-        </header>
-          <ul>
-            {this.state.employees.map(employees =>//renders data for every member of employee
-              //bind react event listener to button, replace with needed action handler when implemented
-              <li key = {employees.id}> {employees.name} <button onClick = {this.doSomethingButton}>Do something</button></li>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Last Name</th>
+              <th>First Name</th>
+              <th>Email</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.employees.map(employees =>
+              <tr>
+                <td>{employees.lastName}</td>
+                <td>{employees.firstName}</td>
+                <td>{employees.email}</td>
+                <td>{employees.accountCreated}</td>
+              </tr>
             )}
-          </ul>
+          </tbody>
+        </table>
       </div>
     );
   }
