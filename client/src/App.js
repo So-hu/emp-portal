@@ -7,12 +7,8 @@ import Navbar from "./components/navbar/navbar";
 import Piechart from "./components/charts/piechart";
 import Barchart from "./components/charts/barchart";
 import Awardstable from "./components/tables/awardstable";
-<<<<<<< HEAD
 import CreateAwardForm from "./components/awards/newAward";
-import { BrowserRouter as Router, Redirect} from "react-router-dom";
-=======
 import { BrowserRouter as Router, Redirect } from "react-router-dom";
->>>>>>> 98637aac10b90658de81ac0f86009166f65383d6
 import Route from "react-router-dom/Route";
 import store from "./store/store";
 import AdminConsole from "./components/admin/newUser";
@@ -123,23 +119,11 @@ class App extends Component {
                             ]}
                           />
                         </div>
+                        <div className="light-blue-border">
+                          <CreateAwardForm />
+                        </div>
                       </div>
                     </div>
-<<<<<<< HEAD
-                    <div className= 'light-blue-border'>
-                      <CreateAwardForm />
-                    </div>
-                  </div>
-                </div>
-              );
-            }}
-            />
-            : <Redirect to='/'/>
-          }
-          <Route path="/logout" strict component={LogOutPage}/>
-        </div>
-      </Router>
-=======
                   );
                 }}
               />
@@ -149,7 +133,6 @@ class App extends Component {
             <Route path="/logout" strict component={LogOutPage} />
           </div>
         </Router>
->>>>>>> 98637aac10b90658de81ac0f86009166f65383d6
       </div>
     );
   }
