@@ -36,19 +36,17 @@ class Navbar extends Component {
               </li>
             ))}
           </ul>
-        </div>
-        <div class="pull-right">
-          <ul class="navbar-nav">
-              <li class="nav-item">
-                <NavLink
-                  to="/logout"
-                  className="nav-link"
-                  activeClassName="active"
-                >
-                  Log Out
-                </NavLink>
-              </li>
-            </ul>
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <NavLink
+                to="/logout"
+                className="nav-link"
+                activeClassName="active"
+              >
+                Log Out
+              </NavLink>
+            </li>
+          </ul>
         </div>
       </nav>
     );
