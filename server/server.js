@@ -7,13 +7,8 @@ app.use(bodyParser.json());
 
 //server connection placeholder
 const mysql = require('mysql');
-var conn = mysql.createConnection({
-    host: 'awardrecognition.cmi3nkb4cxej.us-east-1.rds.amazonaws.com',
-    port: '3306',
-    user: 'zibalteam',
-    password: 'zibalteam19',
-    database: 'awardrecognition'
-});
+const config = require('./config')
+var conn = mysql.createConnection(config);
 
 conn.connect(function(err){
     if (err) {
