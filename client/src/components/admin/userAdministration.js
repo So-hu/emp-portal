@@ -78,6 +78,7 @@ class AdminConsole extends Component {
   };
 
   handleUserEdit = id => {
+    //Todo: implement user edit
     console.log("edit user", id);
   };
 
