@@ -8,6 +8,8 @@ import Piechart from "./components/charts/piechart";
 import Barchart from "./components/charts/barchart";
 import Awardstable from "./components/tables/awardstable";
 import CreateAwardForm from "./components/awards/newAward";
+import Summary from "./components/charts/summary";
+import UserAccount from "./components/account";
 import { BrowserRouter as Router, Redirect } from "react-router-dom";
 import Route from "react-router-dom/Route";
 import store from "./store/store";
@@ -30,7 +32,9 @@ class App extends Component {
         this.setState({
           routes: [
             { route: "/homepage", name: "Home" },
-            { route: "/employees", name: "Employees" }
+            { route: "/newaward", name: "New Award" },
+            { route: "/awardshistory", name: "Awards History" },
+            { route: "/account", name: "Account" }
           ]
         });
       } else if (store.getState().userClass === "administrator") {
@@ -78,55 +82,40 @@ class App extends Component {
                 strict
                 render={() => {
                   return (
-                    <div className="container-fluid">
-                      <h5>Dashboard</h5>
+                    <div className="container-fluid ">
                       <div className="grid-container">
-                        <div className="light-blue-border">
+                        <div >
                           <Piechart />
                         </div>
-                        <div className="light-blue-border">
+                        <div >
                           <Barchart />
                         </div>
-                        <div className="light-blue-border">
-                          <Awardstable
-                            columns={["ID", "Name", "Award Class"]}
-                            rows={[
-                              {
-                                ID: 1,
-                                Name: "David Smith",
-                                "Award Class": "Employee of the Month"
-                              },
-                              {
-                                ID: 2,
-                                Name: "Adrian Romero",
-                                "Award Class": "Employee of the Week"
-                              },
-                              {
-                                ID: 3,
-                                Name: "Ashley Mack",
-                                "Award Class": "Employee of the Week"
-                              },
-                              {
-                                ID: 4,
-                                Name: "Ally Hsu",
-                                "Award Class": "Employee of the Month"
-                              },
-                              {
-                                ID: 5,
-                                Name: "Edwin Rubio",
-                                "Award Class": "Employee of the Month"
-                              }
-                            ]}
-                          />
+                        <div >
+                          <Awardstable />
                         </div>
-                        <div className="light-blue-border">
-                          <CreateAwardForm />
+                        <div >
+                          <Summary />
                         </div>
                       </div>
                     </div>
                   );
                 }}
               />
+            ) : (
+              <Redirect to="/" />
+            )}
+            {this.state.loggedIn ? (
+              <Route path="/newaward" strict component={CreateAwardForm} />
+            ) : (
+              <Redirect to="/" />
+            )}
+            {this.state.loggedIn ? (
+              <Route path="/account" strict component={UserAccount} />
+            ) : (
+              <Redirect to="/" />
+            )}
+            {this.state.loggedIn ? (
+              <Route path="/awardshistory" strict component={Employees} />
             ) : (
               <Redirect to="/" />
             )}
