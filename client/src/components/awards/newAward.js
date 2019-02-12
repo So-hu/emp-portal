@@ -62,7 +62,6 @@ class CreateAwardForm extends Component {
     render(){
         return ( 
             <form onSubmit={this.handleSubmit}>
-                <h5>Create an Award</h5>
                 <div>
                     <label>
                         Employee's First Name:

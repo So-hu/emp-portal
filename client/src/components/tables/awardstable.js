@@ -5,8 +5,34 @@ class Awardstable extends Component {
 
   render(){
     // Data
-    var dataColumns = this.props.columns;
-    var dataRows = this.props.rows;
+    var dataColumns = ["ID", "Name", "Award Class"];
+    var dataRows = [
+      {
+        ID: 1,
+        Name: "David Smith",
+        "Award Class": "Employee of the Month"
+      },
+      {
+        ID: 2,
+        Name: "Adrian Romero",
+        "Award Class": "Employee of the Week"
+      },
+      {
+        ID: 3,
+        Name: "Ashley Mack",
+        "Award Class": "Employee of the Week"
+      },
+      {
+        ID: 4,
+        Name: "Ally Hsu",
+        "Award Class": "Employee of the Month"
+      },
+      {
+        ID: 5,
+        Name: "Edwin Rubio",
+        "Award Class": "Employee of the Month"
+      }
+    ];
 
     var tableHeaders = (<thead>
           <tr>
@@ -25,7 +51,7 @@ class Awardstable extends Component {
      
     // Decorate with Bootstrap CSS
     return (
-      <table className="table table-bordered table-hover infoContainer" width="10%">
+      <table className="table ">
         {tableHeaders}
         {tableBody}
       </table>
