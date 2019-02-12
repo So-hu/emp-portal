@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Employees from "../employees/employees";
+import Users from "./users";
 
 class AdminConsole extends Component {
   constructor(props) {
@@ -11,12 +11,30 @@ class AdminConsole extends Component {
       firstName: "",
       lastName: "",
       userClass: "",
-      msg: ""
+      msg: "",
+      users: [],
+      usersIsLoaded: false,
+      usersError: null,
+      usersMsg: ""
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+
+  updateUsersTable = () => {
+    fetch("/employeeData") //uses the proxy to send request to server for data
+      .then(res => res.json())
+      .then(
+        users =>
+          this.setState({ usersIsLoaded: true, users }, () =>
+            console.log("Users fetched..", users)
+          ),
+        error => {
+          this.setState({ usersIsLoaded: true, usersError: error });
+        }
+      );
+  };
 
   //input validator, returns an object with two members, error and isValid
   isValidInput = (email, password, permissions) => {
@@ -35,6 +53,32 @@ class AdminConsole extends Component {
       errors.password = "User class is required";
     }
     return { errors, isValid: res };
+  };
+
+  handleUserDelete = id => {
+    console.log("delete user", id);
+    this.setState({ msg: "" });
+    let self = this;
+    fetch("/admin/deleteUser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userID: id
+      })
+    })
+      .then(res => {
+        return res.text();
+      })
+      .then(function(data) {
+        self.setState({ msg: data });
+        self.updateUsersTable();
+      });
+  };
+
+  handleUserEdit = id => {
+    console.log("edit user", id);
   };
 
   //when any field in the form is changed, update the state to reflect the new values
@@ -75,13 +119,21 @@ class AdminConsole extends Component {
       .then(function(data) {
         //can't use 'this' here due to context loss in promise
         self.setState({ msg: data });
+        self.updateUsersTable();
       });
   };
 
   render() {
     return (
       <div className="container-fluid">
-        <Employees />
+        <Users
+          error={this.state.usersError}
+          usersLoaded={this.state.usersIsLoaded}
+          users={this.state.users}
+          onUpdateUsersTable={this.updateUsersTable}
+          onUserEdit={this.handleUserEdit}
+          onUserDelete={this.handleUserDelete}
+        />
         <br />
         <div>
           <form onSubmit={this.handleSubmit}>
@@ -146,7 +198,7 @@ class AdminConsole extends Component {
                 value={this.state.userClass}
                 onChange={this.handleChange}
               >
-                <option selected>Choose...</option>
+                <option>Choose...</option>
                 <option>sales</option>
                 <option>supervisor</option>
                 <option>administrator</option>

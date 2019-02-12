@@ -6,7 +6,7 @@ app.use(bodyParser.json());
 
 //server connection placeholder
 const mysql = require("mysql");
-const config = require("./config")
+const config = require("./config");
 var conn = mysql.createConnection(config);
 
 conn.connect(function(err) {
@@ -66,6 +66,18 @@ app.post("/admin/addUser", function(req, res) {
       }
     }
   );
+});
+
+app.post("/admin/deleteUser", function(req, res) {
+  conn.query("DELETE from user WHERE userID = ?", [req.body.userID], function(
+    err
+  ) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send("Successfully Deleted User");
+    }
+  });
 });
 
 //this function will need to return whether the login is valid as well as the userclass.
