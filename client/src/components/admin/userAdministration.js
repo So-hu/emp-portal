@@ -138,26 +138,26 @@ class AdminConsole extends Component {
         <br />
         <div>
           <form onSubmit={this.handleSubmit}>
-            <div class="form-group col-md-6">
-              <div class="form-row">
-                <div class="form-group col-md-6">
+            <div className="form-group col-md-6">
+              <div className="form-row">
+                <div className="form-group col-md-6">
                   <label>Email</label>
                   <input
                     type="email"
                     name="email"
-                    class="form-control"
+                    className="form-control"
                     id="inputEmail4"
                     placeholder="Email"
                     value={this.state.email}
                     onChange={this.handleChange}
                   />
                 </div>
-                <div class="form-group col-md-6">
+                <div className="form-group col-md-6">
                   <label>Password</label>
                   <input
                     type="password"
                     name="password"
-                    class="form-control"
+                    className="form-control"
                     id="inputPassword4"
                     placeholder="Password"
                     value={this.state.password}
@@ -166,36 +166,36 @@ class AdminConsole extends Component {
                 </div>
               </div>
             </div>
-            <div class="form-group col-md-6">
+            <div className="form-group col-md-6">
               <label>First Name</label>
               <input
                 type="text"
                 name="firstName"
-                class="form-control"
+                className="form-control"
                 id="inputFname"
                 placeholder="First Name"
                 value={this.state.firstName}
                 onChange={this.handleChange}
               />
             </div>
-            <div class="form-group col-md-6">
+            <div className="form-group col-md-6">
               <label>Last name</label>
               <input
                 type="text"
                 name="lastName"
-                class="form-control"
+                className="form-control"
                 id="inputLname"
                 placeholder="Last Name"
                 value={this.state.lastName}
                 onChange={this.handleChange}
               />
             </div>
-            <div class="form-group col-md-6">
+            <div className="form-group col-md-6">
               <label>Permissions</label>
               <select
                 id="inputClass"
                 name="userClass"
-                class="form-control"
+                className="form-control"
                 value={this.state.userClass}
                 onChange={this.handleChange}
               >

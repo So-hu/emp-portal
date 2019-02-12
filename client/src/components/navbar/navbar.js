@@ -6,12 +6,12 @@ import { NavLink } from "react-router-dom";
 class Navbar extends Component {
   render() {
     return (
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <NavLink to="/homepage" className="navbar-brand">
           Award Generation Portal
         </NavLink>
         <button
-          class="navbar-toggler"
+          className="navbar-toggler"
           type="button"
           data-toggle="collapse"
           data-target="#navbarSupportedContent"
@@ -19,13 +19,13 @@ class Navbar extends Component {
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-          <span class="navbar-toggler-icon" />
+          <span className="navbar-toggler-icon" />
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav">
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul className="navbar-nav">
             {this.props.routes.map(r => (
-              <li class="nav-item">
+              <li key={r.name} className="nav-item">
                 <NavLink
                   to={r.route}
                   className="nav-link"
@@ -36,8 +36,8 @@ class Navbar extends Component {
               </li>
             ))}
           </ul>
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
+          <ul className="navbar-nav ml-auto">
+            <li className="nav-item">
               <NavLink
                 to="/logout"
                 className="nav-link"

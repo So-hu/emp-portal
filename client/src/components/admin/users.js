@@ -28,7 +28,7 @@ class Users extends Component {
           </thead>
           <tbody>
             {users.map(users => (
-              <tr>
+              <tr key={users.userId}>
                 <td>{users.lastName}</td>
                 <td>{users.firstName}</td>
                 <td>{users.email}</td>
