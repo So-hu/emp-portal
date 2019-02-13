@@ -13,7 +13,7 @@ import UserAccount from "./components/account";
 import { BrowserRouter as Router, Redirect } from "react-router-dom";
 import Route from "react-router-dom/Route";
 import store from "./store/store";
-import AdminConsole from "./components/admin/newUser";
+import AdminConsole from "./components/admin/userAdministration";
 import Reports from "./components/admin/reports";
 
 class App extends Component {
@@ -41,7 +41,7 @@ class App extends Component {
         this.setState({
           routes: [
             { route: "/homepage", name: "Home" },
-            { route: "/admin+console", name: "Admin Console" },
+            { route: "/user+administration", name: "User Administration" },
             { route: "/reports", name: "Reports" }
           ]
         });
@@ -66,7 +66,11 @@ class App extends Component {
               <Redirect to="/" />
             )}
             {this.state.loggedIn ? (
-              <Route path="/admin+console" strict component={AdminConsole} />
+              <Route
+                path="/user+administration"
+                strict
+                component={AdminConsole}
+              />
             ) : (
               <Redirect to="/" />
             )}
@@ -84,16 +88,16 @@ class App extends Component {
                   return (
                     <div className="container-fluid ">
                       <div className="grid-container">
-                        <div >
+                        <div>
                           <Piechart />
                         </div>
-                        <div >
+                        <div>
                           <Barchart />
                         </div>
-                        <div >
+                        <div>
                           <Awardstable />
                         </div>
-                        <div >
+                        <div>
                           <Summary />
                         </div>
                       </div>

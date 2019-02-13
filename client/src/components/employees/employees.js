@@ -28,17 +28,6 @@ class Employees extends Component {
       );
   }
 
-  handleDelete = id => {
-    console.log("delete user", id);
-    //todo:DELETE/POST/UPDATE functionality for admins
-  };
-
-  handleEdit = id => {
-    console.log("edit user", id);
-  };
-
-  //todo:create award function and associated components
-
   render() {
     if (this.state.error) {
       return <div>Error: {this.state.error.message}</div>;
@@ -54,7 +43,6 @@ class Employees extends Component {
               <th>First Name</th>
               <th>Email</th>
               <th>Joined</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -64,20 +52,6 @@ class Employees extends Component {
                 <td>{employees.firstName}</td>
                 <td>{employees.email}</td>
                 <td>{employees.accountCreated}</td>
-                <td>
-                  <button
-                    onClick={() => this.handleEdit(employees.userId)}
-                    className="btn btn-primary"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => this.handleDelete(employees.userId)}
-                    className="btn btn-danger"
-                  >
-                    Delete
-                  </button>
-                </td>
               </tr>
             ))}
           </tbody>

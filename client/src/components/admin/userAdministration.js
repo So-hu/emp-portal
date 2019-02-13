@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Employees from "../employees/employees";
+import Users from "./users";
 
 class AdminConsole extends Component {
   constructor(props) {
@@ -11,12 +11,30 @@ class AdminConsole extends Component {
       firstName: "",
       lastName: "",
       userClass: "",
-      msg: ""
+      msg: "",
+      users: [],
+      usersIsLoaded: false,
+      usersError: null,
+      usersMsg: ""
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+
+  updateUsersTable = () => {
+    fetch("/employeeData") //uses the proxy to send request to server for data
+      .then(res => res.json())
+      .then(
+        users =>
+          this.setState({ usersIsLoaded: true, users }, () =>
+            console.log("Users fetched..", users)
+          ),
+        error => {
+          this.setState({ usersIsLoaded: true, usersError: error });
+        }
+      );
+  };
 
   //input validator, returns an object with two members, error and isValid
   isValidInput = (email, password, permissions) => {
@@ -35,6 +53,33 @@ class AdminConsole extends Component {
       errors.password = "User class is required";
     }
     return { errors, isValid: res };
+  };
+
+  handleUserDelete = id => {
+    console.log("delete user", id);
+    this.setState({ msg: "" });
+    let self = this;
+    fetch("/admin/deleteUser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userID: id
+      })
+    })
+      .then(res => {
+        return res.text();
+      })
+      .then(function(data) {
+        self.setState({ msg: data });
+        self.updateUsersTable();
+      });
+  };
+
+  handleUserEdit = id => {
+    //Todo: implement user edit
+    console.log("edit user", id);
   };
 
   //when any field in the form is changed, update the state to reflect the new values
@@ -75,36 +120,44 @@ class AdminConsole extends Component {
       .then(function(data) {
         //can't use 'this' here due to context loss in promise
         self.setState({ msg: data });
+        self.updateUsersTable();
       });
   };
 
   render() {
     return (
       <div className="container-fluid">
-        <Employees />
+        <Users
+          error={this.state.usersError}
+          usersLoaded={this.state.usersIsLoaded}
+          users={this.state.users}
+          onUpdateUsersTable={this.updateUsersTable}
+          onUserEdit={this.handleUserEdit}
+          onUserDelete={this.handleUserDelete}
+        />
         <br />
         <div>
           <form onSubmit={this.handleSubmit}>
-            <div class="form-group col-md-6">
-              <div class="form-row">
-                <div class="form-group col-md-6">
+            <div className="form-group col-md-6">
+              <div className="form-row">
+                <div className="form-group col-md-6">
                   <label>Email</label>
                   <input
                     type="email"
                     name="email"
-                    class="form-control"
+                    className="form-control"
                     id="inputEmail4"
                     placeholder="Email"
                     value={this.state.email}
                     onChange={this.handleChange}
                   />
                 </div>
-                <div class="form-group col-md-6">
+                <div className="form-group col-md-6">
                   <label>Password</label>
                   <input
                     type="password"
                     name="password"
-                    class="form-control"
+                    className="form-control"
                     id="inputPassword4"
                     placeholder="Password"
                     value={this.state.password}
@@ -113,40 +166,40 @@ class AdminConsole extends Component {
                 </div>
               </div>
             </div>
-            <div class="form-group col-md-6">
+            <div className="form-group col-md-6">
               <label>First Name</label>
               <input
                 type="text"
                 name="firstName"
-                class="form-control"
+                className="form-control"
                 id="inputFname"
                 placeholder="First Name"
                 value={this.state.firstName}
                 onChange={this.handleChange}
               />
             </div>
-            <div class="form-group col-md-6">
+            <div className="form-group col-md-6">
               <label>Last name</label>
               <input
                 type="text"
                 name="lastName"
-                class="form-control"
+                className="form-control"
                 id="inputLname"
                 placeholder="Last Name"
                 value={this.state.lastName}
                 onChange={this.handleChange}
               />
             </div>
-            <div class="form-group col-md-6">
+            <div className="form-group col-md-6">
               <label>Permissions</label>
               <select
                 id="inputClass"
                 name="userClass"
-                class="form-control"
+                className="form-control"
                 value={this.state.userClass}
                 onChange={this.handleChange}
               >
-                <option selected>Choose...</option>
+                <option>Choose...</option>
                 <option>sales</option>
                 <option>supervisor</option>
                 <option>administrator</option>

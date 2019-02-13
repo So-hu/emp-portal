@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
-import './awardstable.css';
+import React, { Component } from "react";
+import "./awardstable.css";
 
 class Awardstable extends Component {
-
-  render(){
+  render() {
     // Data
     var dataColumns = ["ID", "Name", "Award Class"];
     var dataRows = [
@@ -34,28 +33,33 @@ class Awardstable extends Component {
       }
     ];
 
-    var tableHeaders = (<thead>
-          <tr>
-            {dataColumns.map(function(column) {
-              return <th>{column}</th>; })}
-          </tr>
-      </thead>);
+    var tableHeaders = (
+      <thead>
+        <tr>
+          {dataColumns.map(function(column) {
+            return <th key={column}>{column}</th>;
+          })}
+        </tr>
+      </thead>
+    );
 
     var tableBody = dataRows.map(function(row) {
       return (
-        <tr>
+        <tr key={row.ID}>
           {dataColumns.map(function(column) {
-            return <td>{row[column]}</td>; })}
-        </tr>); 
+            return <td key={column}>{row[column]}</td>;
+          })}
+        </tr>
+      );
     });
-     
+
     // Decorate with Bootstrap CSS
     return (
       <table className="table ">
         {tableHeaders}
-        {tableBody}
+        <tbody>{tableBody}</tbody>
       </table>
-    )
+    );
   }
 }
 
