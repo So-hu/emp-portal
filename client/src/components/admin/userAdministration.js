@@ -1,5 +1,18 @@
 import React, { Component } from "react";
 import Users from "./users";
+import Modal from "react-modal";
+import EditUserForm from "./editUserForm";
+
+const modalStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)"
+  }
+};
 
 class AdminConsole extends Component {
   constructor(props) {
@@ -15,12 +28,24 @@ class AdminConsole extends Component {
       users: [],
       usersIsLoaded: false,
       usersError: null,
-      usersMsg: ""
+      usersMsg: "",
+      editId: "",
+      editEmail: "",
+      editPassword: "",
+      editFirstName: "",
+      editLastName: "",
+      editUserClass: "",
+      editModalOpen: false,
+      editMsg: ""
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+
+  closeEditModal = () => {
+    this.setState({ editModalOpen: false });
+  };
 
   updateUsersTable = () => {
     fetch("/employeeData") //uses the proxy to send request to server for data
@@ -77,9 +102,60 @@ class AdminConsole extends Component {
       });
   };
 
-  handleUserEdit = id => {
+  handleUserOpenEdit = id => {
     //Todo: implement user edit
-    console.log("edit user", id);
+    var editUser = this.state.users.find(function(user) {
+      return user.userId === id;
+    });
+    console.log(editUser);
+    console.log(this.state.users);
+    this.setState({
+      editId: id,
+      editEmail: editUser.email,
+      editPassword: editUser.password,
+      editFirstName: editUser.firstName,
+      editLastName: editUser.lastName,
+      editUserClass: editUser.userClass,
+      editModalOpen: true
+    });
+  };
+
+  handleUserSubmitEdit = event => {
+    event.preventDefault();
+    const {
+      editId,
+      editEmail,
+      editPassword,
+      editFirstName,
+      editLastName,
+      editUserClass
+    } = this.state;
+    //Todo: validate edit input
+    this.setState({ msg: "" });
+    let self = this;
+    fetch("/admin/editUser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id: editId,
+        user: editEmail,
+        password: editPassword,
+        firstName: editFirstName,
+        lastName: editLastName,
+        userClass: editUserClass
+      })
+    })
+      .then(res => {
+        return res.text();
+      })
+      .then(function(data) {
+        //can't use 'this' here due to context loss in promise
+        self.setState({ editMsg: data });
+        self.closeEditModal();
+        self.updateUsersTable();
+      });
   };
 
   //when any field in the form is changed, update the state to reflect the new values
@@ -127,12 +203,29 @@ class AdminConsole extends Component {
   render() {
     return (
       <div className="container-fluid">
+        <Modal
+          isOpen={this.state.editModalOpen}
+          style={modalStyles}
+          onRequestClose={this.closeEditModal}
+        >
+          <EditUserForm
+            id={this.state.editId}
+            email={this.state.editEmail}
+            password={this.state.editPassword}
+            firstName={this.state.editFirstName}
+            lastName={this.state.editLastName}
+            userClass={this.state.editUserClass}
+            msg={this.state.msg}
+            handleEdit={this.handleUserSubmitEdit}
+            handleChange={this.handleChange}
+          />
+        </Modal>
         <Users
           error={this.state.usersError}
           usersLoaded={this.state.usersIsLoaded}
           users={this.state.users}
           onUpdateUsersTable={this.updateUsersTable}
-          onUserEdit={this.handleUserEdit}
+          onUserEdit={this.handleUserOpenEdit}
           onUserDelete={this.handleUserDelete}
         />
         <br />

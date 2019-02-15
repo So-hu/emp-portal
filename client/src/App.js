@@ -15,10 +15,14 @@ import Route from "react-router-dom/Route";
 import store from "./store/store";
 import AdminConsole from "./components/admin/userAdministration";
 import Reports from "./components/admin/reports";
+import Modal from "react-modal";
 
 class App extends Component {
   constructor(props) {
     super(props);
+
+    Modal.setAppElement("#root");
+
     this.state = {
       loggedIn: false,
       routes: []

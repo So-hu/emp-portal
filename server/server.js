@@ -24,7 +24,20 @@ app.get("/", function(req, res) {
 //example server side route function for data fetching
 app.get("/employeeData", function(req, res) {
   conn.query(
-    "select lastName, firstName, email, accountCreated, userId from user ORDER BY lastName",
+    "select lastName, firstName, email, userClass, accountCreated, userId from user ORDER BY lastName",
+    function(err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json(result);
+      }
+    }
+  );
+});
+
+app.get("/allAwards", function(req, res) {
+  conn.query(
+    "select awardTypeID, month, date, year, firstName, creatorID from awardGiven ORDER BY firstName",
     function(err, result) {
       if (err) {
         console.log(err);
@@ -44,14 +57,20 @@ app.post("/admin/addUser", function(req, res) {
       if (err) {
         msg = err;
       } else {
+        // Get datetime in mysql-friendly format
+        var timestamp = new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " ");
         conn.query(
-          "INSERT INTO user (userClass, firstName, lastName, email, password) VALUES(?,?,?,?,?)",
+          "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
           [
             req.body.userClass,
             req.body.firstName,
             req.body.lastName,
             req.body.user,
-            req.body.password
+            req.body.password,
+            timestamp
           ],
           function(err) {
             if (err) {
@@ -63,6 +82,31 @@ app.post("/admin/addUser", function(req, res) {
             }
           }
         );
+      }
+    }
+  );
+});
+
+app.post("/admin/editUser", function(req, res) {
+  var changes = {
+    userClass: req.body.userClass,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.user
+  };
+  if (req.body.password != "") {
+    changes.password = req.body.password;
+  }
+  conn.query(
+    "UPDATE user SET ?  WHERE userID = ?",
+    [changes, req.body.id],
+    function(err) {
+      if (err) {
+        console.log(err);
+        console.log(req.body);
+        res.send(err);
+      } else {
+        res.send("Successfully updated user");
       }
     }
   );
