@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Modal from "react-modal";
 
 class Users extends Component {
   state = {};
@@ -22,6 +23,7 @@ class Users extends Component {
               <th>Last Name</th>
               <th>First Name</th>
               <th>Email</th>
+              <th>User Type</th>
               <th>Joined</th>
               <th>Actions</th>
             </tr>
@@ -32,6 +34,7 @@ class Users extends Component {
                 <td>{users.lastName}</td>
                 <td>{users.firstName}</td>
                 <td>{users.email}</td>
+                <td>{users.userClass}</td>
                 <td>{users.accountCreated}</td>
                 <td>
                   <button

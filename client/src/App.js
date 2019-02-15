@@ -16,10 +16,14 @@ import store from "./store/store";
 import AdminConsole from "./components/admin/userAdministration";
 import Reports from "./components/admin/reports";
 import awardsHistory from "./components/awards/awardsHistory";
+import Modal from "react-modal";
 
 class App extends Component {
   constructor(props) {
     super(props);
+
+    Modal.setAppElement("#root");
+
     this.state = {
       loggedIn: false,
       routes: []
