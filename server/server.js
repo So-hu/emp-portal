@@ -6,7 +6,7 @@ app.use(bodyParser.json());
 
 //server connection placeholder
 const mysql = require("mysql");
-const config = require("./config");
+const config = require("./config.js");
 var conn = mysql.createConnection(config);
 
 conn.connect(function(err) {
