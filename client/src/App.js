@@ -7,6 +7,7 @@ import Navbar from "./components/navbar/navbar";
 import Piechart from "./components/charts/piechart";
 import Barchart from "./components/charts/barchart";
 import Awardstable from "./components/tables/awardstable";
+import AllAwards from "./components/tables/allAwards";
 import CreateAwardForm from "./components/awards/newAward";
 import Summary from "./components/charts/summary";
 import UserAccount from "./components/account";
@@ -123,7 +124,7 @@ class App extends Component {
               <Redirect to="/" />
             )}
             {this.state.loggedIn ? (
-              <Route path="/awardshistory" strict component={Employees} />
+              <Route path="/awardshistory" strict component={AllAwards} />
             ) : (
               <Redirect to="/" />
             )}
