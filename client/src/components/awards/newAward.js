@@ -54,6 +54,25 @@ class CreateAwardForm extends Component {
         if (isValid){
             console.log(this.state);
 
+            //valid input
+            fetch("/user/addAward", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                month: this.state.sendDate,
+                date: this.state.sendDate,
+                year: this.state.sendDate,
+                time: this.state.sendTime,
+                firstName: this.state.employeeFirstName
+              })
+            })
+
+            .then(res => {
+                return res.text();
+              })
+
             //clear form
             this.setState(initialState);
         }

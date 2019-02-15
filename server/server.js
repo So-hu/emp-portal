@@ -35,6 +35,20 @@ app.get("/employeeData", function(req, res) {
   );
 });
 
+//example server side route function for data fetching
+app.get("/awardsData", function(req, res) {
+  conn.query(
+    "select month, date, year, firstName from awardGiven ORDER BY month",
+    function(err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json(result);
+      }
+    }
+  );
+});
+
 app.post("/admin/addUser", function(req, res) {
   var msg = "";
   conn.query(
@@ -66,6 +80,32 @@ app.post("/admin/addUser", function(req, res) {
       }
     }
   );
+});
+
+app.post("/user/addAward", function(req, res) {
+  var msg = "";
+      console.log(req.body);
+        conn.query(
+          "INSERT INTO awardGiven (month, date, year, time, firstName) VALUES(?,?,?,?,?)",
+          [
+            req.body.month,
+            req.body.date,
+            req.body.year,
+            req.body.time,
+            req.body.firstName
+          ],
+          function(err) {
+            if (err) {
+              msg = "Email Already in Use";
+              console.log(err);
+              res.send(msg);
+            } else {
+              msg = "Successfully Added User";
+              console.log(err);
+              res.send(msg);
+            }
+          }
+        );
 });
 
 app.post("/admin/deleteUser", function(req, res) {

@@ -1,0 +1,9 @@
+const config = {
+   host: "awardrecognition.cmi3nkb4cxej.us-east-1.rds.amazonaws.com",
+   port: "3306",
+   user: "zibalteam",
+   password: "zibalteam19",
+   database: "awardrecognition"
+}
+
+module.exports = config

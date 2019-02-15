@@ -15,6 +15,7 @@ import Route from "react-router-dom/Route";
 import store from "./store/store";
 import AdminConsole from "./components/admin/userAdministration";
 import Reports from "./components/admin/reports";
+import awardsHistory from "./components/awards/awardsHistory";
 
 class App extends Component {
   constructor(props) {
@@ -119,7 +120,7 @@ class App extends Component {
               <Redirect to="/" />
             )}
             {this.state.loggedIn ? (
-              <Route path="/awardshistory" strict component={Employees} />
+              <Route path="/awardshistory" strict component={awardsHistory} />
             ) : (
               <Redirect to="/" />
             )}
