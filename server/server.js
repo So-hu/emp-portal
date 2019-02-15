@@ -103,7 +103,6 @@ app.post("/admin/editUser", function(req, res) {
     function(err) {
       if (err) {
         console.log(err);
-        console.log(req.body);
         res.send(err);
       } else {
         res.send("Successfully updated user");
