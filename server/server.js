@@ -105,8 +105,9 @@ app.post("/user/addAward", function(req, res) {
   var msg = "";
       console.log(req.body);
         conn.query(
-          "INSERT INTO awardGiven (month, date, year, time, firstName) VALUES(?,?,?,?,?)",
+          "INSERT INTO awardGiven (awardTypeID, month, date, year, time, firstName) VALUES(?,?,?,?,?,?)",
           [
+            req.body.awardTypeID,
             req.body.month,
             req.body.date,
             req.body.year,
