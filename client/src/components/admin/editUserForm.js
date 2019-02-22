@@ -77,9 +77,8 @@ class EditUserForm extends Component {
               defaultValue={this.state.userClass}
             >
               <option />
-              <option>sales</option>
-              <option>supervisor</option>
               <option>administrator</option>
+              <option>nonadministrator</option>
             </select>
           </div>
           <button className="btn btn-primary">Save Changes</button>

@@ -24,7 +24,7 @@ app.get("/", function(req, res) {
 //example server side route function for data fetching
 app.get("/employeeData", function(req, res) {
   conn.query(
-    "select lastName, firstName, email, userClass, accountCreated, userId from user ORDER BY lastName",
+    "select lastName, firstName, email, userClass, accountCreated, id from user ORDER BY lastName",
     function(err, result) {
       if (err) {
         console.log(err);
@@ -35,23 +35,16 @@ app.get("/employeeData", function(req, res) {
   );
 });
 
-app.get("/allAwards", function(req, res) {
-  conn.query(
-    "select awardTypeID, month, date, year, firstName, creatorID from awardGiven ORDER BY firstName",
-    function(err, result) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(result);
-      }
-    }
-  );
-});
-
-//example server side route function for data fetching
+//Get awards history
 app.get("/awardsData", function(req, res) {
   conn.query(
-    "select month, date, year, firstName from awardGiven ORDER BY month",
+    "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+    employee.lastName as recipientLast, user.firstName as creatorFirst, \
+    user.lastName as creatorLast FROM awardrecognition.awardGiven \
+    JOIN awardType on awardGiven.awardTypeID=awardType.id \
+    JOIN employee on awardGiven.recipientID=employee.id \
+    JOIN user on awardGiven.creatorID=user.id \
+    ORDER BY date DESC;",
     function(err, result) {
       if (err) {
         console.log(err);
@@ -103,31 +96,47 @@ app.post("/admin/addUser", function(req, res) {
 
 app.post("/user/addAward", function(req, res) {
   var msg = "";
-      console.log(req.body);
+  conn.query(
+    "SELECT id from employee WHERE firstName=? AND lastName=? AND email=?",
+    [req.body.firstName, req.body.lastName, req.body.email],
+    function(err, result) {
+      if (err) {
+        msg = "Error with request";
+        console.log(err);
+        res.send(msg);
+      } else if (result.length == 0) {
+        msg = "User not found";
+        res.send(msg);
+      } else {
+        //Use id from above query to find the recipient
+        recipientID = result[0].id;
+        //TODO: get creatorID from currently logged in user
+        creatorID = 1;
         conn.query(
-          "INSERT INTO awardGiven (awardTypeID, month, date, year, time, firstName) VALUES(?,?,?,?,?,?)",
+          "INSERT INTO awardGiven (awardTypeID, recipientID, creatorID, date, time) VALUES(?,?,?,?,?)",
           [
             req.body.awardTypeID,
-            req.body.month,
+            recipientID,
+            creatorID,
             req.body.date,
-            req.body.year,
-            req.body.time,
-            req.body.firstName
+            req.body.time
           ],
           function(err) {
             if (err) {
-              msg = "Email Already in Use";
               console.log(err);
+              msg = "Award failed.";
               res.send(msg);
             } else {
-              msg = "Successfully Added User";
-              console.log(err);
+              msg = "Award successfully granted.";
               res.send(msg);
             }
           }
         );
+      }
+    }
+  );
 });
-  
+
 app.post("/admin/editUser", function(req, res) {
   var changes = {
     userClass: req.body.userClass,
@@ -139,7 +148,7 @@ app.post("/admin/editUser", function(req, res) {
     changes.password = req.body.password;
   }
   conn.query(
-    "UPDATE user SET ?  WHERE userID = ?",
+    "UPDATE user SET ?  WHERE id = ?",
     [changes, req.body.id],
     function(err) {
       if (err) {
@@ -153,9 +162,7 @@ app.post("/admin/editUser", function(req, res) {
 });
 
 app.post("/admin/deleteUser", function(req, res) {
-  conn.query("DELETE from user WHERE userID = ?", [req.body.userID], function(
-    err
-  ) {
+  conn.query("DELETE from user WHERE id = ?", [req.body.userID], function(err) {
     if (err) {
       res.send(err);
     } else {
