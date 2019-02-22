@@ -4,11 +4,25 @@ import SmallReport from "./smallReport";
 import CustomReport from "./customReport";
 
 class Reports extends Component {
-  state = {};
+  state = {
+    data: [],
+    dataIsLoaded: false,
+    dataError: {}
+  };
 
-  componentDidMount() {
-    //todo: fetch report data for default reports
-  }
+  getData = target => {
+    fetch(target)
+      .then(res => res.json())
+      .then(
+        response =>
+          this.setState({ dataIsLoaded: true, data: response }, () =>
+            console.log("Data fetched..", response)
+          ),
+        error => {
+          this.setState({ dataIsLoaded: true, dataError: error });
+        }
+      );
+  };
 
   render() {
     return (
@@ -17,10 +31,14 @@ class Reports extends Component {
           <div className="col">
             <h1>Default Reports</h1>
             <div className="row">
-              <SmallReport />
+              <SmallReport
+                data={this.state.data}
+                target="topRecipients"
+                getData={this.getData}
+              />
             </div>
             <div className="row">
-              <SmallReport />
+              <p>placeholder</p>
             </div>
           </div>
           <div className="col">

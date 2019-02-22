@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import Barchart from "../charts/barchart";
-import ReportOptions from "../admin/reportOptions";
+import ReportOptions from "./reportOptions";
 
 class Report extends Component {
   state = {
@@ -11,7 +10,7 @@ class Report extends Component {
       <div className="report">
         <div className="row">
           <div className="col">
-            <Barchart />
+            <p>Chart here!</p>
           </div>
           <div className="col">
             <div className="row">

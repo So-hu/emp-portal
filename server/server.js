@@ -171,6 +171,36 @@ app.post("/admin/deleteUser", function(req, res) {
   });
 });
 
+// Sample report option for top 5 award recipients
+app.get("/report/topRecipients", function(req, res) {
+  conn.query(
+    "SELECT Count(*) AS Count, \
+  CONCAT_WS(' ', firstName, lastName) AS Name\
+  FROM awardGiven\
+  INNER JOIN employee ON employee.id=awardGiven.recipientID\
+  GROUP BY employee.id\
+  ORDER BY Count DESC\
+  LIMIT 5",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting top recipients");
+      } else {
+        data = {
+          chartTitle: "Top 5 Award Winners",
+          chartData: [["", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          console.log(e);
+          data.chartData.push([e.Name, e.Count]);
+        });
+        console.log(data);
+        res.json(data);
+      }
+    }
+  );
+});
+
 //this function will need to return whether the login is valid as well as the userclass.
 app.post("/userAuth", function(req, res) {
   const { user, password } = req.body;
