@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import './newAward.css'
 
 const initialState = {
     employeeFirstName: "",
@@ -6,12 +7,13 @@ const initialState = {
     employeeEmail: "", 
     sendDate: "",
     sendTime: "",
-    awardClass: "month", 
+    awardClass: "", 
     firstNameError: "",
     lastNameError: "",
     emailError: "",
     dateError: "",
-    timeError: ""
+    timeError: "", 
+    awardError: ""
 }
 
 class CreateAwardForm extends Component {
@@ -27,21 +29,36 @@ class CreateAwardForm extends Component {
         let firstNameError = "";
         let lastNameError = "";
         let emailError = "";
+        let awardError = "";
+        let dateError = "";
+        let timeError = "";
 
         if (!this.state.employeeFirstName){
-            firstNameError = "first name should not be empty!";
+            firstNameError = "First name is required";
         }
 
         if (!this.state.employeeLastName){
-            lastNameError = "last name should not be empty!";
+            lastNameError = "Last name is required";
         }
 
         if (!this.state.employeeEmail.includes('@')){
-            emailError = "invalid email!";
+            emailError = "Invalid email";
         }
 
-        if(emailError || firstNameError || lastNameError){
-            this.setState({emailError, firstNameError, lastNameError});
+        if (!this.state.awardClass){
+            awardError = "Select award type";
+        }
+
+        if (!this.state.sendDate){
+            dateError = "Enter a send date";
+        }
+
+        if (!this.state.sendTime){
+            timeError = "Enter a send time";
+        }
+
+        if(emailError || firstNameError || lastNameError || awardError || dateError || timeError){
+            this.setState({emailError, firstNameError, lastNameError, awardError, dateError, timeError});
             return false;
         }
 
@@ -61,6 +78,7 @@ class CreateAwardForm extends Component {
                 "Content-Type": "application/json"
               },
               body: JSON.stringify({
+                awardTypeID: this.state.awardClass,
                 month: this.state.sendDate,
                 date: this.state.sendDate,
                 year: this.state.sendDate,
@@ -80,65 +98,42 @@ class CreateAwardForm extends Component {
 
     render(){
         return ( 
+            <div class="form-style-6">
+            <h1>Create a New Award</h1>
             <form onSubmit={this.handleSubmit}>
-                <div>
-                    <label>
-                        Employee's First Name:
-                        <input name="employeeFirstName" placeholder="First Name" value={this.state.employeeFirstName} 
-                        onChange={this.handleChange} 
-                        />
-                        <div style={{color: "red", fontSize: 12}}>
-                            {this.state.firstNameError}
-                        </div>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Employee's Last Name:
-                        <input name="employeeLastName" placeholder="Last Name" value={this.state.employeeLastName} 
-                        onChange={this.handleChange} 
-                        />
-                        <div style={{color: "red", fontSize: 12}}>
-                            {this.state.lastNameError}
-                        </div>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Employee's Email:
-                        <input name="employeeEmail" placeHolder="email" value={this.state.employeeEmail} 
-                        onChange={this.handleChange} 
-                        />
-                        <div style={{color: "red", fontSize: 12}}>
-                            {this.state.emailError}
-                        </div>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Award Class:
-                        <select name="awardClass" value={this.state.awardClass} onChange={this.handleChange}>
-                            <option value="month">Employee of the Month</option>
-                            <option value="week">Employee of the Week</option>
-                        </select>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Send Date (MM/DD/YYYY):
-                        <input type="date" name="sendDate" value={this.state.sendDate} onChange={this.handleChange}/>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Send Time (HH:MM AM/PM):
-                        <input type="time" name="sendTime" value={this.state.sendTime} onChange={this.handleChange}/>
-                    </label>
-                </div>
-                <div>
-                    <button type="submit">Create Award</button>
-                </div>
+                    <div style={{color: "red"}}>
+                        {this.state.firstNameError}
+                    </div>
+                <input type="text" name="employeeFirstName" placeholder="First Name" value={this.state.employeeFirstName} onChange={this.handleChange} />
+                    <div style={{color: "red"}}>
+                        {this.state.lastNameError}
+                    </div>
+                <input type="text" name="employeeLastName" placeholder="Last Name" value={this.state.employeeLastName} onChange={this.handleChange} />
+                    <div style={{color: "red"}}>
+                        {this.state.emailError}
+                    </div>
+                <input type="email" name="employeeEmail" placeHolder="Email" value={this.state.employeeEmail} onChange={this.handleChange} />
+                    <div style={{color: "red"}}>
+                            {this.state.awardError}
+                    </div>
+                <select name="awardClass" value={this.state.awardClass} onChange={this.handleChange}>
+                            <option value="" disabled selected>Select Award Type</option>
+                            <option value="1">Employee of the Month</option>
+                            <option value="2">Employee of the Week</option>
+                </select>
+                    <div style={{color: "red"}}>
+                            {this.state.dateError}
+                    </div>
+                    Send Date (mm/dd/yyyy):
+                <input type="date" name="sendDate" value={this.state.sendDate} onChange={this.handleChange}/>
+                    <div style={{color: "red"}}>
+                            {this.state.timeError}
+                    </div>
+                    Send Time (hh:mm am/pm):
+                <input type="time" name="sendTime" value={this.state.sendTime} onChange={this.handleChange}/>
+                <input type="submit" value="Create Award"/>
             </form>
+            </div>
         )
     }
 }
