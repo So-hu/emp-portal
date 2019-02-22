@@ -29,22 +29,22 @@ class Users extends Component {
             </tr>
           </thead>
           <tbody>
-            {users.map(users => (
-              <tr key={users.userId}>
-                <td>{users.lastName}</td>
-                <td>{users.firstName}</td>
-                <td>{users.email}</td>
-                <td>{users.userClass}</td>
-                <td>{users.accountCreated}</td>
+            {users.map(user => (
+              <tr key={user.id}>
+                <td>{user.lastName}</td>
+                <td>{user.firstName}</td>
+                <td>{user.email}</td>
+                <td>{user.userClass}</td>
+                <td>{user.accountCreated}</td>
                 <td>
                   <button
-                    onClick={() => onUserEdit(users.userId)}
+                    onClick={() => onUserEdit(user.id)}
                     className="btn btn-primary"
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => onUserDelete(users.userId)}
+                    onClick={() => onUserDelete(user.id)}
                     className="btn btn-danger"
                   >
                     Delete

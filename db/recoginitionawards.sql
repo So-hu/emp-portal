@@ -12,6 +12,7 @@ SET foreign_key_checks = 1;
 
 CREATE TABLE `user` (
   `id` int(255) NOT NULL AUTO_INCREMENT,
+  `userClass` varchar(100) NOT NULL,
   `firstName` varchar(100) NOT NULL,
   `lastName` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
@@ -54,6 +55,7 @@ CREATE TABLE `awardGiven` (
   `recipientID` int(255) NOT NULL,
   `creatorID` int(255) NOT NULL,
   `date` DATE NOT NULL,
+  `time` TIME NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`awardTypeID`) REFERENCES awardType(id),
   FOREIGN KEY (`recipientID`) REFERENCES employee(id),
@@ -64,10 +66,10 @@ CREATE TABLE `awardGiven` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`firstName`, `lastName`, `email`, `password`, `signature`) VALUES
-('Indiana', 'Jones', 'IndianaJones@rocks.com', 'indianajones', 'indianajonessignature.jpg'),
-('Jared', 'Goff', 'jaredgoff@beatthepatriots.com', 'jaredgoff', 'jaredgoffsignature.jpg'),
-('Steve', 'Rogers', 'steverogers@captainamerica.com', 'steverogers', 'steverogerssignature.jpg');
+INSERT INTO `user` (`firstName`, `lastName`, `userClass`, `email`, `password`, `signature`) VALUES
+('Indiana', 'Jones', 'administrator', 'IndianaJones@rocks.com', 'indianajones', 'indianajonessignature.jpg'),
+('Jared', 'Goff', 'nonadministrator', 'jaredgoff@beatthepatriots.com', 'jaredgoff', 'jaredgoffsignature.jpg'),
+('Steve', 'Rogers', 'nonadministrator', 'steverogers@captainamerica.com', 'steverogers', 'steverogerssignature.jpg');
 
 --
 -- Dumping data for table `awardType`
@@ -95,19 +97,19 @@ INSERT INTO `employee` (`firstName`, `lastName`, `email`) VALUES
 -- Dumping data for table `awardGiven`
 --
 
-INSERT INTO `awardGiven` (`awardTypeID`, `recipientID`, `creatorID`, `date`) VALUES
-(2, 2, 2, '2018-01-01'),
-(1, 2, 2, '2018-01-31'),
-(3, 6, 3, '2018-02-01'),
-(1, 7, 1, '2018-03-01'),
-(1, 1, 1, '2018-03-15'),
-(1, 3, 2, '2018-04-01'),
-(3, 4, 2, '2018-05-01'),
-(3, 5, 3, '2018-06-01'),
-(1, 3, 3, '2018-06-08'),
-(1, 2, 3, '2018-07-01'),
-(1, 6, 3, '2018-08-01'),
-(3, 1, 3, '2018-09-01'),
-(1, 5, 3, '2018-10-01'),
-(1, 5, 1, '2018-11-01'),
-(1, 5, 1, '2018-12-01');
+INSERT INTO `awardGiven` (`awardTypeID`, `recipientID`, `creatorID`, `date`, `time`) VALUES
+(2, 2, 2, '2018-01-01', '15:00:00'),
+(1, 2, 2, '2018-01-31', '15:00:00'),
+(3, 6, 3, '2018-02-01', '15:00:00'),
+(1, 7, 1, '2018-03-01', '15:00:00'),
+(1, 1, 1, '2018-03-15', '15:00:00'),
+(1, 3, 2, '2018-04-01', '15:00:00'),
+(3, 4, 2, '2018-05-01', '15:00:00'),
+(3, 5, 3, '2018-06-01', '15:00:00'),
+(1, 3, 3, '2018-06-08', '15:00:00'),
+(1, 2, 3, '2018-07-01', '15:00:00'),
+(1, 6, 3, '2018-08-01', '15:00:00'),
+(3, 1, 3, '2018-09-01', '15:00:00'),
+(1, 5, 3, '2018-10-01', '15:00:00'),
+(1, 5, 1, '2018-11-01', '15:00:00'),
+(1, 5, 1, '2018-12-01', '15:00:00');
