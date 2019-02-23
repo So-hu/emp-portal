@@ -101,6 +101,7 @@ class Login extends Component {
             name="user"
             placeholder="Email Address"
             type="text"
+            className="form-control"
             value={this.state.user}
             onChange={this.handleChange}
           />
@@ -112,12 +113,13 @@ class Login extends Component {
             name="password"
             placeholder="Enter Password"
             type="password"
+            className="form-control"
             value={this.state.password}
             onChange={this.handleChange}
           />
           <br />
           <div>{errors.password}</div>
-          <button>Login</button>
+          <button className="btn btn-primary">Login</button>
         </form>
       </div>
     );

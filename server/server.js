@@ -3,8 +3,7 @@ const app = express();
 var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-var bcrypt = require('bcryptjs')
-
+var bcrypt = require("bcryptjs");
 
 const mysql = require("mysql");
 const config = require("./config.js");
@@ -70,8 +69,8 @@ app.post("/admin/addUser", function(req, res) {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
-        bcrypt.genSalt(10, function(err, salt){
-          bcrypt.hash("abc123", salt, function(err,hash){
+        bcrypt.genSalt(10, function(err, salt) {
+          bcrypt.hash("abc123", salt, function(err, hash) {
             conn.query(
               "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
               [
@@ -93,7 +92,7 @@ app.post("/admin/addUser", function(req, res) {
               }
             );
           });
-        })
+        });
       }
     }
   );
@@ -174,6 +173,112 @@ app.post("/admin/deleteUser", function(req, res) {
       res.send("Successfully Deleted User");
     }
   });
+});
+
+// Sample report option for top 5 award recipients
+app.get("/report/topRecipients", function(req, res) {
+  conn.query(
+    "SELECT Count(*) AS Count, \
+  CONCAT_WS(' ', firstName, lastName) AS Name\
+  FROM awardGiven\
+  INNER JOIN employee ON employee.id=awardGiven.recipientID\
+  GROUP BY employee.id\
+  ORDER BY Count DESC\
+  LIMIT 5",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting top recipients");
+      } else {
+        data = {
+          chartTitle: "Top 5 Award Winners",
+          chartHTitle: "Number of awards",
+          chartData: [["", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          data.chartData.push([e.Name, e.Count]);
+        });
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/topGivers", function(req, res) {
+  conn.query(
+    "SELECT Count(*) AS Count, \
+  CONCAT_WS(' ', firstName, lastName) AS Name\
+  FROM awardGiven\
+  INNER JOIN user ON user.id=awardGiven.creatorID\
+  GROUP BY user.id\
+  ORDER BY Count DESC\
+  LIMIT 5",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting top recipients");
+      } else {
+        data = {
+          chartTitle: "Top 5 Award Givers",
+          chartHTitle: "Number of awards",
+          chartData: [["", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          data.chartData.push([e.Name, e.Count]);
+        });
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/awardsByMonth", function(req, res) {
+  conn.query(
+    'SELECT MONTHNAME(awardGiven.date) as Month, COUNT(*) as Awards\
+    FROM awardrecognition.awardGiven\
+    WHERE YEAR(awardGiven.date) = "2018"\
+    GROUP BY MONTH(awardGiven.date)',
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardsByMonth");
+      } else {
+        data = {
+          chartTitle: "Awards by Month",
+          chartHTitle: "Month",
+          chartData: [["Month", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          data.chartData.push([e.Month, e.Awards]);
+        });
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/awardsByYear", function(req, res) {
+  conn.query(
+    "SELECT YEAR(awardGiven.date) as Year, COUNT(*) as Awards\
+    FROM awardrecognition.awardGiven\
+    GROUP BY YEAR(awardGiven.date)",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardsByYear");
+      } else {
+        data = {
+          chartTitle: "Awards by Year",
+          chartHTitle: "Year",
+          chartData: [["Year", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          data.chartData.push([e.Year.toString(), e.Awards]);
+        });
+        res.json(data);
+      }
+    }
+  );
 });
 
 //this function will need to return whether the login is valid as well as the userclass.
