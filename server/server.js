@@ -3,8 +3,7 @@ const app = express();
 var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-var bcrypt = require('bcryptjs')
-
+var bcrypt = require("bcryptjs");
 
 const mysql = require("mysql");
 const config = require("./config.js");
@@ -70,8 +69,8 @@ app.post("/admin/addUser", function(req, res) {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
-        bcrypt.genSalt(10, function(err, salt){
-          bcrypt.hash("abc123", salt, function(err,hash){
+        bcrypt.genSalt(10, function(err, salt) {
+          bcrypt.hash("abc123", salt, function(err, hash) {
             conn.query(
               "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
               [
@@ -93,7 +92,7 @@ app.post("/admin/addUser", function(req, res) {
               }
             );
           });
-        })
+        });
       }
     }
   );
@@ -197,10 +196,8 @@ app.get("/report/topRecipients", function(req, res) {
           chartData: [["", "Number of awards"]]
         };
         rows.forEach(function(e) {
-          console.log(e);
           data.chartData.push([e.Name, e.Count]);
         });
-        console.log(data);
         res.json(data);
       }
     }
@@ -227,10 +224,8 @@ app.get("/report/topGivers", function(req, res) {
           chartData: [["", "Number of awards"]]
         };
         rows.forEach(function(e) {
-          console.log(e);
           data.chartData.push([e.Name, e.Count]);
         });
-        console.log(data);
         res.json(data);
       }
     }
@@ -254,10 +249,8 @@ app.get("/report/awardsByMonth", function(req, res) {
           chartData: [["Month", "Number of awards"]]
         };
         rows.forEach(function(e) {
-          console.log(e);
           data.chartData.push([e.Month, e.Awards]);
         });
-        console.log(data);
         res.json(data);
       }
     }
@@ -280,10 +273,8 @@ app.get("/report/awardsByYear", function(req, res) {
           chartData: [["Year", "Number of awards"]]
         };
         rows.forEach(function(e) {
-          console.log(e);
           data.chartData.push([e.Year.toString(), e.Awards]);
         });
-        console.log(data);
         res.json(data);
       }
     }
