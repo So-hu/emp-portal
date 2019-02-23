@@ -17,7 +17,7 @@ class Users extends Component {
     }
     return (
       <div>
-        <table className="table">
+        <table className="table table-striped">
           <thead>
             <tr>
               <th>Last Name</th>
