@@ -234,10 +234,10 @@ app.get("/report/topGivers", function(req, res) {
 
 app.get("/report/awardsByMonth", function(req, res) {
   conn.query(
-    'SELECT MONTH(awardGiven.date) as Month, COUNT(*) as Awards\
+    'SELECT MONTHNAME(awardGiven.date) as Month, COUNT(*) as Awards\
     FROM awardrecognition.awardGiven\
     WHERE YEAR(awardGiven.date) = "2018"\
-    GROUP BY MONTH(awardGiven.date) DESC',
+    GROUP BY MONTH(awardGiven.date)',
     function(err, rows) {
       if (err) {
         console.log(err);
@@ -263,7 +263,7 @@ app.get("/report/awardsByYear", function(req, res) {
   conn.query(
     "SELECT YEAR(awardGiven.date) as Year, COUNT(*) as Awards\
     FROM awardrecognition.awardGiven\
-    GROUP BY YEAR(awardGiven.date) DESC",
+    GROUP BY YEAR(awardGiven.date)",
     function(err, rows) {
       if (err) {
         console.log(err);
@@ -271,12 +271,12 @@ app.get("/report/awardsByYear", function(req, res) {
       } else {
         data = {
           chartTitle: "Awards by Year",
-          chartHTitle: "Number of awards",
+          chartHTitle: "Year",
           chartData: [["Year", "Number of awards"]]
         };
         rows.forEach(function(e) {
           console.log(e);
-          data.chartData.push([e.Year, e.Awards]);
+          data.chartData.push([e.Year.toString(), e.Awards]);
         });
         console.log(data);
         res.json(data);

@@ -26,8 +26,7 @@ class SmallReport extends Component {
                 title: this.props.data.chartTitle,
                 chartArea: { width: "50%" },
                 hAxis: {
-                  title: this.props.data.chartHTitle,
-                  minValue: 0
+                  title: this.props.data.chartHTitle
                 }
               }}
             />

@@ -101,7 +101,7 @@ class Reports extends Component {
             <div className="row">
               <SmallReport
                 data={this.state.data4}
-                type="BarChart"
+                type="ColumnChart"
                 target="awardsByYear"
                 getData={this.getData4}
               />
