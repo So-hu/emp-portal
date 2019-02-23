@@ -1,25 +1,67 @@
 import React, { Component } from "react";
-import Report from "./report";
 import SmallReport from "./smallReport";
-import CustomReport from "./customReport";
 
 class Reports extends Component {
   state = {
-    data: [],
-    dataIsLoaded: false,
+    data1: [],
+    data2: [],
+    data3: [],
+    data4: [],
     dataError: {}
   };
 
-  getData = target => {
+  getData1 = target => {
     fetch(target)
       .then(res => res.json())
       .then(
         response =>
-          this.setState({ dataIsLoaded: true, data: response }, () =>
+          this.setState({ data1: response }, () =>
             console.log("Data fetched..", response)
           ),
         error => {
-          this.setState({ dataIsLoaded: true, dataError: error });
+          this.setState({ dataError: error });
+        }
+      );
+  };
+
+  getData2 = target => {
+    fetch(target)
+      .then(res => res.json())
+      .then(
+        response =>
+          this.setState({ data2: response }, () =>
+            console.log("Data fetched..", response)
+          ),
+        error => {
+          this.setState({ dataError: error });
+        }
+      );
+  };
+
+  getData3 = target => {
+    fetch(target)
+      .then(res => res.json())
+      .then(
+        response =>
+          this.setState({ data3: response }, () =>
+            console.log("Data fetched..", response)
+          ),
+        error => {
+          this.setState({ dataError: error });
+        }
+      );
+  };
+
+  getData4 = target => {
+    fetch(target)
+      .then(res => res.json())
+      .then(
+        response =>
+          this.setState({ data4: response }, () =>
+            console.log("Data fetched..", response)
+          ),
+        error => {
+          this.setState({ dataError: error });
         }
       );
   };
@@ -27,22 +69,43 @@ class Reports extends Component {
   render() {
     return (
       <div className="reportsPage container-fluid">
+        <h1>Default Reports</h1>
         <div className="row">
           <div className="col">
-            <h1>Default Reports</h1>
             <div className="row">
               <SmallReport
-                data={this.state.data}
+                data={this.state.data1}
+                type="BarChart"
                 target="topRecipients"
-                getData={this.getData}
+                getData={this.getData1}
               />
             </div>
             <div className="row">
-              <p>placeholder</p>
+              <SmallReport
+                data={this.state.data2}
+                type="BarChart"
+                target="topGivers"
+                getData={this.getData2}
+              />
             </div>
           </div>
           <div className="col">
-            <CustomReport />
+            <div className="row">
+              <SmallReport
+                data={this.state.data3}
+                type="ColumnChart"
+                target="awardsByMonth"
+                getData={this.getData3}
+              />
+            </div>
+            <div className="row">
+              <SmallReport
+                data={this.state.data4}
+                type="BarChart"
+                target="awardsByYear"
+                getData={this.getData4}
+              />
+            </div>
           </div>
         </div>
       </div>

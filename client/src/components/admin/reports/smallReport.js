@@ -4,43 +4,36 @@ import { NavLink } from "react-router-dom";
 
 class SmallReport extends Component {
   state = {
-    target: this.props.target,
     getData: this.props.getData
   };
 
   componentDidMount() {
-    this.state.getData("/report/" + this.state.target);
+    this.state.getData("/report/" + this.props.target);
   }
 
   render() {
     return (
       <div className="smallReport">
         <div className="row">
-          <div className="col-10">
+          <div className="col-6">
             <Chart
               width={"600px"}
               height={"400px"}
-              chartType="BarChart"
+              chartType={this.props.type}
               loader={<div>Loading Chart</div>}
               data={this.props.data.chartData}
               options={{
                 title: this.props.data.chartTitle,
                 chartArea: { width: "50%" },
                 hAxis: {
-                  title: "Number of Awards",
+                  title: this.props.data.chartHTitle,
                   minValue: 0
                 }
               }}
-              rootProps={{ "data-testid": "1" }}
             />
           </div>
-          <div className="col-2">
-            <NavLink
-              to={"/fullreport/" + this.state.target}
-              className="btn btn-secondary"
-            >
-              Full Report
-            </NavLink>
+          <div className="col-6">
+            <table className="" />
           </div>
         </div>
       </div>

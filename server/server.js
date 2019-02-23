@@ -188,11 +188,95 @@ app.get("/report/topRecipients", function(req, res) {
       } else {
         data = {
           chartTitle: "Top 5 Award Winners",
+          chartHTitle: "Number of awards",
           chartData: [["", "Number of awards"]]
         };
         rows.forEach(function(e) {
           console.log(e);
           data.chartData.push([e.Name, e.Count]);
+        });
+        console.log(data);
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/topGivers", function(req, res) {
+  conn.query(
+    "SELECT Count(*) AS Count, \
+  CONCAT_WS(' ', firstName, lastName) AS Name\
+  FROM awardGiven\
+  INNER JOIN user ON user.id=awardGiven.creatorID\
+  GROUP BY user.id\
+  ORDER BY Count DESC\
+  LIMIT 5",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting top recipients");
+      } else {
+        data = {
+          chartTitle: "Top 5 Award Givers",
+          chartHTitle: "Number of awards",
+          chartData: [["", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          console.log(e);
+          data.chartData.push([e.Name, e.Count]);
+        });
+        console.log(data);
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/awardsByMonth", function(req, res) {
+  conn.query(
+    'SELECT MONTH(awardGiven.date) as Month, COUNT(*) as Awards\
+    FROM awardrecognition.awardGiven\
+    WHERE YEAR(awardGiven.date) = "2018"\
+    GROUP BY MONTH(awardGiven.date) DESC',
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardsByMonth");
+      } else {
+        data = {
+          chartTitle: "Awards by Month",
+          chartHTitle: "Month",
+          chartData: [["Month", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          console.log(e);
+          data.chartData.push([e.Month, e.Awards]);
+        });
+        console.log(data);
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/awardsByYear", function(req, res) {
+  conn.query(
+    "SELECT YEAR(awardGiven.date) as Year, COUNT(*) as Awards\
+    FROM awardrecognition.awardGiven\
+    GROUP BY YEAR(awardGiven.date) DESC",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardsByYear");
+      } else {
+        data = {
+          chartTitle: "Awards by Year",
+          chartHTitle: "Number of awards",
+          chartData: [["Year", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          console.log(e);
+          data.chartData.push([e.Year, e.Awards]);
         });
         console.log(data);
         res.json(data);
