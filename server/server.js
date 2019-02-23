@@ -3,8 +3,9 @@ const app = express();
 var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
+var bcrypt = require('bcryptjs')
 
-//server connection placeholder
+
 const mysql = require("mysql");
 const config = require("./config.js");
 var conn = mysql.createConnection(config);
@@ -69,26 +70,30 @@ app.post("/admin/addUser", function(req, res) {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
-        conn.query(
-          "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
-          [
-            req.body.userClass,
-            req.body.firstName,
-            req.body.lastName,
-            req.body.user,
-            req.body.password,
-            timestamp
-          ],
-          function(err) {
-            if (err) {
-              msg = "Email Already in Use";
-              res.send(msg);
-            } else {
-              msg = "Successfully Added User";
-              res.send(msg);
-            }
-          }
-        );
+        bcrypt.genSalt(10, function(err, salt){
+          bcrypt.hash("abc123", salt, function(err,hash){
+            conn.query(
+              "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
+              [
+                req.body.userClass,
+                req.body.firstName,
+                req.body.lastName,
+                req.body.user,
+                hash,
+                timestamp
+              ],
+              function(err) {
+                if (err) {
+                  msg = "Email Already in Use";
+                  res.send(msg);
+                } else {
+                  msg = "Successfully Added User";
+                  res.send(msg);
+                }
+              }
+            );
+          });
+        })
       }
     }
   );
