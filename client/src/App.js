@@ -14,7 +14,7 @@ import { BrowserRouter as Router, Redirect } from "react-router-dom";
 import Route from "react-router-dom/Route";
 import store from "./store/store";
 import AdminConsole from "./components/admin/userAdministration";
-import Reports from "./components/admin/reports";
+import Reports from "./components/admin/reports/reports";
 import awardsHistory from "./components/awards/awardsHistory";
 import Modal from "react-modal";
 
