@@ -3,11 +3,7 @@ const app = express();
 var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-<<<<<<< HEAD
-var bcrypt = require('bcryptjs')
-=======
-var bcrypt = require("bcryptjs");
->>>>>>> origin
+var bcrypt = require('bcryptjs');
 
 const mysql = require("mysql");
 const config = require("./config.js");
@@ -72,13 +68,8 @@ app.post("/admin/addUser", function(req, res) {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
-<<<<<<< HEAD
         bcrypt.genSalt(10, function(err, salt){
           bcrypt.hash(req.body.password, salt, function(err,hash){
-=======
-        bcrypt.genSalt(10, function(err, salt) {
-          bcrypt.hash("abc123", salt, function(err, hash) {
->>>>>>> origin
             conn.query(
               "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
               [
@@ -292,8 +283,6 @@ app.get("/report/awardsByYear", function(req, res) {
 //this function will need to return whether the login is valid as well as the userclass.
 app.post("/userAuth", function(req, res) {
   const { user, password } = req.body;
-  console.log(user)
-  console.log(password)
   /*if(user == "admin"){
     res.json({valid: true, role: "administrator", msg:""})
   }*/
@@ -304,7 +293,6 @@ app.post("/userAuth", function(req, res) {
       res.json(result)
     }
     else{
-      console.log(data)
       bcrypt.compare(password, data[0].password, function(err, isMatch){
         if(isMatch){
           result.valid = true
