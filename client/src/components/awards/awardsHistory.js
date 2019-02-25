@@ -41,7 +41,6 @@ class awardsHistory extends Component {
               <th>Date</th>
               <th>Type</th>
               <th>Awarded To</th>
-              <th>Awarded By</th>
             </tr>
           </thead>
           <tbody>
@@ -51,9 +50,6 @@ class awardsHistory extends Component {
                 <td>{awards.type}</td>
                 <td>
                   {awards.recipientFirst} {awards.recipientLast}
-                </td>
-                <td>
-                  {awards.creatorFirst} {awards.creatorLast}
                 </td>
               </tr>
             ))}
