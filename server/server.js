@@ -3,7 +3,7 @@ const app = express();
 var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-var bcrypt = require("bcryptjs");
+var bcrypt = require('bcryptjs');
 
 const mysql = require("mysql");
 const config = require("./config.js");
@@ -30,8 +30,7 @@ app.get("/employeeData", function(req, res) {
         console.log(err);
       } else {
         res.json(result);
-      }
-    }
+      }    }
   );
 });
 
@@ -69,8 +68,8 @@ app.post("/admin/addUser", function(req, res) {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
-        bcrypt.genSalt(10, function(err, salt) {
-          bcrypt.hash("abc123", salt, function(err, hash) {
+        bcrypt.genSalt(10, function(err, salt){
+          bcrypt.hash(req.body.password, salt, function(err,hash){
             conn.query(
               "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
               [
@@ -406,17 +405,28 @@ app.get("/user/summary", function(req, res) {
 //this function will need to return whether the login is valid as well as the userclass.
 app.post("/userAuth", function(req, res) {
   const { user, password } = req.body;
+  /*if(user == "admin"){
+    res.json({valid: true, role: "administrator", msg:""})
+  }*/
   var result = { valid: false, role: "", msg: "" };
-  if (user === "admin" && password === "123") {
-    result.valid = true;
-    result.role = "administrator";
-  } else if (user === "joe" && password === "schmoe") {
-    result.valid = true;
-    result.role = "user";
-  } else {
-    result.msg = "Username and password do not match";
-  }
-  res.json(result);
+  conn.query("SELECT password, userClass from user WHERE email= ?",[user], function(err, data){
+    if(data.length == 0){
+      result.msg = "Username and password do not match"
+      res.json(result)
+    }
+    else{
+      bcrypt.compare(password, data[0].password, function(err, isMatch){
+        if(isMatch){
+          result.valid = true
+          result.role = data[0].userClass
+        }
+        else{
+          result.msg = "Username and password do not match"
+        }
+        res.json(result) 
+      })
+    }    
+  })
 });
 
 app.listen(port, function() {

@@ -15,7 +15,7 @@ CREATE TABLE `user` (
   `userClass` varchar(100) NOT NULL,
   `firstName` varchar(100) NOT NULL,
   `lastName` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL UNIQUE,
   `password` varchar(100) NOT NULL,
   `signature` varchar(100) NOT NULL,
   `accountCreated` TIMESTAMP NOT NULL,
