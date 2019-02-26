@@ -2,6 +2,15 @@ import React, { Component } from 'react';
 import { Chart } from "react-google-charts";
 
 class Barchart extends Component{
+
+    state = { awards: [] }
+
+	componentDidMount() {
+		fetch('/user/top5employess')
+		.then(res => res.json())
+		.then(awards => this.setState({ awards }));
+	}
+
     render(){
         return(
             <div className="Barchart">
@@ -11,11 +20,12 @@ class Barchart extends Component{
                     chartType="BarChart"
                     loader={<div>Loading Chart</div>}
                     data={[
-                        ['', 'Employee of the Month', 'Employee of the Week'],
-                        ['Sam', 81, 80],
-                        ['Carlos', 37, 36],
-                        ['David', 26, 28],
-                        ['Sarah', 20, 19],
+                        ['', 'Number of Awards'],
+                        [this.state.awards.employee1, this.state.awards.emp1Awards],
+                        [this.state.awards.employee2, this.state.awards.emp2Awards],
+                        [this.state.awards.employee3, this.state.awards.emp3Awards],
+                        [this.state.awards.employee4, this.state.awards.emp4Awards],
+                        [this.state.awards.employee5, this.state.awards.emp5Awards]
                     ]}
                     options={{
                         title: 'Top 5 Employees',

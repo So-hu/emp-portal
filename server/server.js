@@ -275,7 +275,129 @@ app.get("/report/awardsByYear", function(req, res) {
         rows.forEach(function(e) {
           data.chartData.push([e.Year.toString(), e.Awards]);
         });
+        
         res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/user/awardsgiven", function(req, res) {
+
+  //res.json({"total":100});
+  var eom = 0; //employee of the month counter
+  var eow = 0; //employee of the week counter
+  var hsm = 0; //highest sale of the month
+  var unknown = 0;
+
+  conn.query(
+    "SELECT awardTypeID FROM awardGiven",
+    function(err, data) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardGiven");
+      } 
+      else {
+        for (var i = 0; i < data.length; i++){
+          if (data[i].awardTypeID === 1){
+            eom++;
+          }
+          else if (data[i].awardTypeID === 2){
+            eow++;
+          }
+          else if (data[i].awardTypeID === 3){
+            hsm++;
+          }
+          else{
+            unknown++;
+          }
+        }
+        res.send ({eom, eow, hsm, unknown});
+      };
+
+    });
+
+  });
+
+  app.get("/user/top5employess", function(req, res) {
+  
+    conn.query(
+      "SELECT Count(*) AS Count, \
+      CONCAT_WS(' ', firstName, lastName) AS Name\
+      FROM awardGiven\
+      INNER JOIN employee ON awardGiven.recipientID=employee.id\
+      GROUP BY employee.id\
+      ORDER BY Count DESC\
+      LIMIT 5",
+      function(err, data) {
+        if (err) {
+          console.log(err);
+          res.send("Error getting awardGiven");
+        } 
+        else {
+          data = {
+            employee1: data[0].Name, emp1Awards: data[0].Count,
+            employee2: data[1].Name, emp2Awards: data[1].Count,
+            employee3: data[2].Name, emp3Awards: data[2].Count,
+            employee4: data[3].Name, emp4Awards: data[3].Count,
+            employee5: data[4].Name, emp5Awards: data[4].Count,
+          }
+          res.send (data);
+        };
+  
+      });
+  
+    });
+
+//Get awards history
+app.get("/user/awardsData", function(req, res) {
+  conn.query(
+    "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+    employee.lastName as recipientLast \
+    FROM awardrecognition.awardGiven \
+    JOIN awardType on awardGiven.awardTypeID=awardType.id \
+    JOIN employee on awardGiven.recipientID=employee.id \
+    ORDER BY date DESC \
+    LIMIT 5;",
+    function(err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json(result);
+      }
+    }
+  );
+});
+
+//Get awards history
+app.get("/user/summary", function(req, res) {
+  var data;
+  var numEmps;
+  var awardsGiven;
+  conn.query(
+    "SELECT Count(*) AS Count FROM employee",
+    function(err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        numEmps = result[0].Count;
+
+        conn.query(
+          "SELECT Count(*) AS Count2 FROM awardGiven",
+          function(err, result2) {
+            if (err) {
+              console.log(err);
+            } else {
+              awardsGiven = result2[0].Count2;
+
+              data = {
+                numEmployees: numEmps, numberAwards: awardsGiven,
+              }
+              res.json(data);
+            }
+          }
+        );
+        
       }
     }
   );

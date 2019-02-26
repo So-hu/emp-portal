@@ -2,63 +2,61 @@ import React, { Component } from "react";
 import "./awardstable.css";
 
 class Awardstable extends Component {
-  render() {
-    // Data
-    var dataColumns = ["ID", "Name", "Award Class"];
-    var dataRows = [
-      {
-        ID: 1,
-        Name: "David Smith",
-        "Award Class": "Employee of the Month"
-      },
-      {
-        ID: 2,
-        Name: "Adrian Romero",
-        "Award Class": "Employee of the Week"
-      },
-      {
-        ID: 3,
-        Name: "Ashley Mack",
-        "Award Class": "Employee of the Week"
-      },
-      {
-        ID: 4,
-        Name: "Ally Hsu",
-        "Award Class": "Employee of the Month"
-      },
-      {
-        ID: 5,
-        Name: "Edwin Rubio",
-        "Award Class": "Employee of the Month"
-      }
-    ];
+  constructor() {
+    super();
+    this.state = {
+      error: null,
+      isLoaded: false,
+      awards: []
+    };
+  }
 
-    var tableHeaders = (
-      <thead>
-        <tr>
-          {dataColumns.map(function(column) {
-            return <th key={column}>{column}</th>;
-          })}
-        </tr>
-      </thead>
-    );
-
-    var tableBody = dataRows.map(function(row) {
-      return (
-        <tr key={row.ID}>
-          {dataColumns.map(function(column) {
-            return <td key={column}>{row[column]}</td>;
-          })}
-        </tr>
+  componentDidMount() {
+    this.setState({ mounted: true });
+    fetch("/user/awardsData") //uses the proxy to send request to server for data
+      .then(res => res.json())
+      .then(
+        awards =>
+          this.setState({ isLoaded: true, awards }, () =>
+            console.log("Awards fetched..", awards)
+          ),
+        error => {
+          this.setState({ isLoaded: true, error });
+        }
       );
-    });
+  }
 
-    // Decorate with Bootstrap CSS
+  render() {
+    if (this.state.error) {
+      return <div>Error: {this.state.error.message}</div>;
+    } else if (!this.state.isLoaded) {
+      return <div>Loading.....</div>;
+    }
     return (
-      <table className="table ">
-        {tableHeaders}
-        <tbody>{tableBody}</tbody>
-      </table>
+      
+      <div>
+        <h6>Last 5 Awards Created</h6>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Awarded To</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.awards.map(awards => (
+              <tr>
+                <td>{awards.date}</td>
+                <td>{awards.type}</td>
+                <td>
+                  {awards.recipientFirst} {awards.recipientLast}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     );
   }
 }
