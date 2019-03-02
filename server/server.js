@@ -100,6 +100,7 @@ app.post("/admin/addUser", function(req, res) {
 app.post("/user/addAward", function(req, res) {
   var msg = "";
   conn.query(
+
     "SELECT id from employee WHERE firstName=? AND lastName=? AND email=?",
     [req.body.firstName, req.body.lastName, req.body.email],
     function(err, result) {
@@ -397,6 +398,42 @@ app.get("/user/summary", function(req, res) {
           }
         );
         
+      }
+    }
+  );
+});
+
+app.get("/user/employeesonsystem", function(req, res) {
+  conn.query(
+  "SELECT id, firstName, lastName, email FROM employee",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting top employees from database.");
+      } else {
+        console.log("Server 1: " + rows[0].firstName); 
+        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName }))
+        //console.log("Server: " + data[0].firstName + " " + data[0].id);
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/user/getemployee", function(req, res) {
+  console.log("this id as sent: " + req.query.id);
+  conn.query(
+  "SELECT id, firstName, lastName, email FROM employee WHERE id=?",
+  [req.query.id],
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting employee from database.");
+      } else {
+        console.log("Server 1100: " + rows[0].firstName); 
+        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName, email: x.email }))
+        //console.log("Server: " + data[0].firstName + " " + data[0].id);
+        res.json(data);
       }
     }
   );

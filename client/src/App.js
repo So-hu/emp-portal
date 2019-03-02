@@ -33,7 +33,7 @@ class App extends Component {
       this.setState({
         loggedIn: store.getState().authenticated
       });
-      if (store.getState().userClass === "user") {
+      if (store.getState().userClass === "nonadministrator") {
         this.setState({
           routes: [
             { route: "/homepage", name: "Home" },
