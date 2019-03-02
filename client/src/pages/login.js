@@ -76,7 +76,7 @@ class Login extends Component {
           errors: { login: data.msg }
         });
         if (data.valid === true) {
-          store.dispatch(logIn(data.role));
+          store.dispatch(logIn(user, data.role));
         }
       });
   };
