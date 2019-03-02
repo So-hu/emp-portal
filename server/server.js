@@ -3,7 +3,7 @@ const app = express();
 var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-var bcrypt = require('bcryptjs');
+var bcrypt = require("bcryptjs");
 
 const mysql = require("mysql");
 const config = require("./config.js");
@@ -30,7 +30,8 @@ app.get("/employeeData", function(req, res) {
         console.log(err);
       } else {
         res.json(result);
-      }    }
+      }
+    }
   );
 });
 
@@ -68,8 +69,8 @@ app.post("/admin/addUser", function(req, res) {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
-        bcrypt.genSalt(10, function(err, salt){
-          bcrypt.hash(req.body.password, salt, function(err,hash){
+        bcrypt.genSalt(10, function(err, salt) {
+          bcrypt.hash(req.body.password, salt, function(err, hash) {
             conn.query(
               "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
               [
@@ -275,7 +276,7 @@ app.get("/report/awardsByYear", function(req, res) {
         rows.forEach(function(e) {
           data.chartData.push([e.Year.toString(), e.Awards]);
         });
-        
+
         res.json(data);
       }
     }
@@ -283,71 +284,64 @@ app.get("/report/awardsByYear", function(req, res) {
 });
 
 app.get("/user/awardsgiven", function(req, res) {
-
   //res.json({"total":100});
   var eom = 0; //employee of the month counter
   var eow = 0; //employee of the week counter
   var hsm = 0; //highest sale of the month
   var unknown = 0;
 
-  conn.query(
-    "SELECT awardTypeID FROM awardGiven",
-    function(err, data) {
-      if (err) {
-        console.log(err);
-        res.send("Error getting awardGiven");
-      } 
-      else {
-        for (var i = 0; i < data.length; i++){
-          if (data[i].awardTypeID === 1){
-            eom++;
-          }
-          else if (data[i].awardTypeID === 2){
-            eow++;
-          }
-          else if (data[i].awardTypeID === 3){
-            hsm++;
-          }
-          else{
-            unknown++;
-          }
+  conn.query("SELECT awardTypeID FROM awardGiven", function(err, data) {
+    if (err) {
+      console.log(err);
+      res.send("Error getting awardGiven");
+    } else {
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].awardTypeID === 1) {
+          eom++;
+        } else if (data[i].awardTypeID === 2) {
+          eow++;
+        } else if (data[i].awardTypeID === 3) {
+          hsm++;
+        } else {
+          unknown++;
         }
-        res.send ({eom, eow, hsm, unknown});
-      };
-
-    });
-
+      }
+      res.send({ eom, eow, hsm, unknown });
+    }
   });
+});
 
-  app.get("/user/top5employess", function(req, res) {
-  
-    conn.query(
-      "SELECT Count(*) AS Count, \
+app.get("/user/top5employess", function(req, res) {
+  conn.query(
+    "SELECT Count(*) AS Count, \
       CONCAT_WS(' ', firstName, lastName) AS Name\
       FROM awardGiven\
       INNER JOIN employee ON awardGiven.recipientID=employee.id\
       GROUP BY employee.id\
       ORDER BY Count DESC\
       LIMIT 5",
-      function(err, data) {
-        if (err) {
-          console.log(err);
-          res.send("Error getting awardGiven");
-        } 
-        else {
-          data = {
-            employee1: data[0].Name, emp1Awards: data[0].Count,
-            employee2: data[1].Name, emp2Awards: data[1].Count,
-            employee3: data[2].Name, emp3Awards: data[2].Count,
-            employee4: data[3].Name, emp4Awards: data[3].Count,
-            employee5: data[4].Name, emp5Awards: data[4].Count,
-          }
-          res.send (data);
+    function(err, data) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardGiven");
+      } else {
+        data = {
+          employee1: data[0].Name,
+          emp1Awards: data[0].Count,
+          employee2: data[1].Name,
+          emp2Awards: data[1].Count,
+          employee3: data[2].Name,
+          emp3Awards: data[2].Count,
+          employee4: data[3].Name,
+          emp4Awards: data[3].Count,
+          employee5: data[4].Name,
+          emp5Awards: data[4].Count
         };
-  
-      });
-  
-    });
+        res.send(data);
+      }
+    }
+  );
+});
 
 //Get awards history
 app.get("/user/awardsData", function(req, res) {
@@ -374,33 +368,30 @@ app.get("/user/summary", function(req, res) {
   var data;
   var numEmps;
   var awardsGiven;
-  conn.query(
-    "SELECT Count(*) AS Count FROM employee",
-    function(err, result) {
-      if (err) {
-        console.log(err);
-      } else {
-        numEmps = result[0].Count;
+  conn.query("SELECT Count(*) AS Count FROM employee", function(err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      numEmps = result[0].Count;
 
-        conn.query(
-          "SELECT Count(*) AS Count2 FROM awardGiven",
-          function(err, result2) {
-            if (err) {
-              console.log(err);
-            } else {
-              awardsGiven = result2[0].Count2;
+      conn.query("SELECT Count(*) AS Count2 FROM awardGiven", function(
+        err,
+        result2
+      ) {
+        if (err) {
+          console.log(err);
+        } else {
+          awardsGiven = result2[0].Count2;
 
-              data = {
-                numEmployees: numEmps, numberAwards: awardsGiven,
-              }
-              res.json(data);
-            }
-          }
-        );
-        
-      }
+          data = {
+            numEmployees: numEmps,
+            numberAwards: awardsGiven
+          };
+          res.json(data);
+        }
+      });
     }
-  );
+  });
 });
 
 app.get("/user/employeesonsystem", function(req, res) {
@@ -446,24 +437,26 @@ app.post("/userAuth", function(req, res) {
     res.json({valid: true, role: "administrator", msg:""})
   }*/
   var result = { valid: false, role: "", msg: "" };
-  conn.query("SELECT password, userClass from user WHERE email= ?",[user], function(err, data){
-    if(data.length == 0){
-      result.msg = "Username and password do not match"
-      res.json(result)
+  conn.query(
+    "SELECT password, userClass from user WHERE email= ?",
+    [user],
+    function(err, data) {
+      if (data.length == 0) {
+        result.msg = "Username and password do not match";
+        res.json(result);
+      } else {
+        bcrypt.compare(password, data[0].password, function(err, isMatch) {
+          if (isMatch) {
+            result.valid = true;
+            result.role = data[0].userClass;
+          } else {
+            result.msg = "Username and password do not match";
+          }
+          res.json(result);
+        });
+      }
     }
-    else{
-      bcrypt.compare(password, data[0].password, function(err, isMatch){
-        if(isMatch){
-          result.valid = true
-          result.role = data[0].userClass
-        }
-        else{
-          result.msg = "Username and password do not match"
-        }
-        res.json(result) 
-      })
-    }    
-  })
+  );
 });
 
 app.listen(port, function() {
