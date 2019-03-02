@@ -8,20 +8,64 @@ const initialState = {
   employeeEmail: "",
   sendDate: "",
   sendTime: "",
+  empId: "",
   awardClass: "",
   firstNameError: "",
   lastNameError: "",
   emailError: "",
   dateError: "",
   timeError: "",
-  awardError: ""
+  awardError: "",
+  selectedEmployee: "",
 };
 
 class CreateAwardForm extends Component {
-  state = initialState;
+  state = {
+    initialState,
+    empOnSys: []
+  };
+
+  componentDidMount() {
+    let initialEmployees = [];
+    fetch('/user/employeesonsystem')
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+          initialEmployees = data.map((employee) => { return {id: employee.id, firstName: employee.firstName, lastName: employee.lastName}})
+            this.setState({empOnSys: [{value: " ", display: "(select employee)"}].concat(initialEmployees)});
+        }).catch(error => {
+          console.log(error);
+        });
+  }
 
   handleChange = event => {
     console.log(event.target.name);
+    if(event.target.name === "selectedEmployee"){
+      console.log("auto enter data");
+      console.log(this.state);
+
+      //valid input
+      const encodedValue = encodeURIComponent(event.target.value);
+      fetch("/user/getemployee?id=" + event.target.value, {
+        method: "GET"
+      }).then(res => {
+        return res.json();
+        //return res.text();
+      })
+      .then(data => {
+        console.log("Thisi is form the server api: " + data[0].firstName)
+        this.setState({ 
+          employeeFirstName: data[0].firstName, 
+          employeeLastName: data[0].lastName,
+          employeeEmail: data[0].email,
+          sendDate: data[0].sendDate,
+          sendTime: data[0].sendTime,
+          empId: data[0].id,
+         });
+      })
+    }
+    else
     this.setState({ [event.target.name]: event.target.value });
   };
 
@@ -91,6 +135,7 @@ class CreateAwardForm extends Component {
         headers: {
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
           awardTypeID: this.state.awardClass,
           date: this.state.sendDate,
@@ -109,10 +154,24 @@ class CreateAwardForm extends Component {
   };
 
   render() {
+
     return (
       <div class="form-style-6">
         <h1>Create a New Award</h1>
         <form onSubmit={this.handleSubmit}>
+          <div>
+            <h6>Select Employee</h6>
+            <select 
+              name="selectedEmployee"
+              value={this.state.selectedEmployee} 
+              //onChange={(e) => this.setState({selectedTeam: e.target.value})}
+              onChange={this.handleChange}
+            >
+              {this.state.empOnSys.map((Emp) => <option key={Emp.id} value={Emp.id}>{Emp.id} {Emp.firstName} {Emp.lastName}</option>)}
+            </select>
+          </div>
+
+          <h6>Or Enter New Employee</h6>
           <div style={{ color: "red" }}>{this.state.firstNameError}</div>
           <input
             type="text"
@@ -143,11 +202,10 @@ class CreateAwardForm extends Component {
             value={this.state.awardClass}
             onChange={this.handleChange}
           >
-            <option value="" disabled selected>
-              Select Award Type
-            </option>
+            <option value="" disabled selected>Select Award Type</option>
             <option value="1">Employee of the Month</option>
             <option value="2">Employee of the Week</option>
+            <option value="3">Highest Sales in a Month</option>
           </select>
           <div style={{ color: "red" }}>{this.state.dateError}</div>
           Send Date (mm/dd/yyyy):
