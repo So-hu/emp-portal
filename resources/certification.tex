@@ -11,12 +11,8 @@ lmargin=.5cm,rmargin=.5cm}
 \usepackage{ulem}
 \usepackage{datatool}
 
-\begin{document}
 
-\DTLloaddb{awardInformation}{data.csv}
-\DTLforeach{awardInformation} {
-\recipientFirstName=recipientFirstName, \recipientLastName=recipientLastName, \creatorFirstName=creatorFirstName, \creatorLastName=creatorLastName, \awardDate=awardDate,
-\awardName=awardName}
+\begin{document}
 
 \centering
 \scalebox{3}{\color{blue}
@@ -28,29 +24,33 @@ lmargin=.5cm,rmargin=.5cm}
 \curlyframe[.9\columnwidth]{
 
 \textcolor{blue}
-{Zibal Company}\\
+{** COMPANY NAME **}\\
 
 \textcolor{black}{
-As a thank you for your outstanding performance and dedication, we hereby recognize you as}
+As a thank you for your outstanding performance and dedication, we hereby award the}
 
 \smallskip
 
-{\large \textsc{\awardName}}
+{\textit{Certificate of}}
+
+{\large \textsc{** AWARD TYPE **}}
 
 \vspace{2mm}
 
+\tiny
+to: \uline{\textcolor{black}
+{NAME OF PERSON}}
 
-\tiny to: \uline{\textcolor{black}{\sc {\recipientFirstName} {\recipientLastName}}}
 
-
-\vspace{5mm}
+\vspace{8mm}
 
 {\color{red}
 \scalebox{0.9}{
 \begin{tabular}{ccc}
-\\ {\creatorSignature} && {\awardDate}
-\\ {\sc$\overline{{\creatorFirstName} {\creatorLastName}}$} &&
-$\overline{Date Awarded}$ \\
+\cline{1-1} 
+\cline{3-3}
+\\ PERSON GIVING RECOGNITION  & &  SUPERVISOR NAME \\
+TITLE & & SUPERVISOR TITLE \\
 \end{tabular}
 }}}}
 \end{minipage}
