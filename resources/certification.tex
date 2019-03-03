@@ -11,8 +11,12 @@ lmargin=.5cm,rmargin=.5cm}
 \usepackage{ulem}
 \usepackage{datatool}
 
-
 \begin{document}
+
+\DTLloaddb{awardInformation}{/Users/Murphy/OSU CS/467 Capstone/Project/emp-portal/resources/data.csv}
+\DTLforeach{awardInformation} {
+\recipientFirstName=recipientFirstName, \recipientLastName=recipientLastName, \creatorFirstName=creatorFirstName, \creatorLastName=creatorLastName, \awardDate=awardDate,
+\awardName=awardName}
 
 \centering
 \scalebox{3}{\color{blue}
@@ -24,33 +28,29 @@ lmargin=.5cm,rmargin=.5cm}
 \curlyframe[.9\columnwidth]{
 
 \textcolor{blue}
-{** COMPANY NAME **}\\
+{Zibal Company}\\
 
 \textcolor{black}{
-As a thank you for your outstanding performance and dedication, we hereby award the}
+As a thank you for your outstanding performance and dedication, we hereby recognize you as}
 
 \smallskip
 
-{\textit{Certificate of}}
-
-{\large \textsc{** AWARD TYPE **}}
+{\large \textsc{\awardName}}
 
 \vspace{2mm}
 
-\tiny
-to: \uline{\textcolor{black}
-{NAME OF PERSON}}
+
+\tiny to: \uline{\textcolor{black}{\sc {\recipientFirstName} {\recipientLastName}}}
 
 
-\vspace{8mm}
+\vspace{5mm}
 
 {\color{red}
 \scalebox{0.9}{
 \begin{tabular}{ccc}
-\cline{1-1} 
-\cline{3-3}
-\\ PERSON GIVING RECOGNITION  & &  SUPERVISOR NAME \\
-TITLE & & SUPERVISOR TITLE \\
+\\ {\creatorSignature} && {\awardDate}
+\\ {\sc$\overline{{\creatorFirstName} {\creatorLastName}}$} &&
+$\overline{Date Awarded}$ \\
 \end{tabular}
 }}}}
 \end{minipage}
