@@ -11,6 +11,18 @@ class SmallReport extends Component {
     this.state.getData("/report/" + this.props.target);
   }
 
+  openDownloadWindow = url => {
+    console.log(url);
+    window.open(url);
+  };
+
+  getDownload = () => {
+    var getDownLoadUrl = "/testGetDownloadUrl?report=" + this.props.target;
+    fetch(getDownLoadUrl)
+      .then(res => res.json())
+      .then(url => this.openDownloadWindow(url));
+  };
+
   render() {
     return (
       <div className="smallReport">
@@ -32,7 +44,9 @@ class SmallReport extends Component {
             />
           </div>
           <div className="col-6">
-            <table className="" />
+            <button onClick={this.getDownload} className="btn btn-secondary">
+              Download
+            </button>
           </div>
         </div>
       </div>

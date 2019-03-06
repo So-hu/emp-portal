@@ -4,6 +4,7 @@ var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 var bcrypt = require("bcryptjs");
+var path = require("path");
 
 const mysql = require("mysql");
 const config = require("./config.js");
@@ -101,7 +102,6 @@ app.post("/admin/addUser", function(req, res) {
 app.post("/user/addAward", function(req, res) {
   var msg = "";
   conn.query(
-
     "SELECT id from employee WHERE firstName=? AND lastName=? AND email=?",
     [req.body.firstName, req.body.lastName, req.body.email],
     function(err, result) {
@@ -395,34 +395,43 @@ app.get("/user/summary", function(req, res) {
 });
 
 app.get("/user/employeesonsystem", function(req, res) {
-  conn.query(
-  "SELECT id, firstName, lastName, email FROM employee",
-    function(err, rows) {
-      if (err) {
-        console.log(err);
-        res.send("Error getting top employees from database.");
-      } else {
-        console.log("Server 1: " + rows[0].firstName); 
-        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName }))
-        //console.log("Server: " + data[0].firstName + " " + data[0].id);
-        res.json(data);
-      }
+  conn.query("SELECT id, firstName, lastName, email FROM employee", function(
+    err,
+    rows
+  ) {
+    if (err) {
+      console.log(err);
+      res.send("Error getting top employees from database.");
+    } else {
+      console.log("Server 1: " + rows[0].firstName);
+      var data = rows.map(x => ({
+        id: x.id,
+        firstName: x.firstName,
+        lastName: x.lastName
+      }));
+      //console.log("Server: " + data[0].firstName + " " + data[0].id);
+      res.json(data);
     }
-  );
+  });
 });
 
 app.get("/user/getemployee", function(req, res) {
   console.log("this id as sent: " + req.query.id);
   conn.query(
-  "SELECT id, firstName, lastName, email FROM employee WHERE id=?",
-  [req.query.id],
+    "SELECT id, firstName, lastName, email FROM employee WHERE id=?",
+    [req.query.id],
     function(err, rows) {
       if (err) {
         console.log(err);
         res.send("Error getting employee from database.");
       } else {
-        console.log("Server 1100: " + rows[0].firstName); 
-        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName, email: x.email }))
+        console.log("Server 1100: " + rows[0].firstName);
+        var data = rows.map(x => ({
+          id: x.id,
+          firstName: x.firstName,
+          lastName: x.lastName,
+          email: x.email
+        }));
         //console.log("Server: " + data[0].firstName + " " + data[0].id);
         res.json(data);
       }
@@ -454,6 +463,32 @@ app.post("/userAuth", function(req, res) {
           }
           res.json(result);
         });
+      }
+    }
+  );
+});
+
+//Front end calls this function to construct the .csv, and send a download url
+app.get("/testGetDownloadUrl", function(req, res) {
+  var report = req.query.report;
+
+  //TODO make .csv, currently hardcoded to exist
+
+  var url = "http://localhost:5000/testDownload?report=" + report;
+  console.log(url);
+  res.json(url);
+});
+
+//This is the download url the frontend calls to download the report file
+app.get("/testDownload", function(req, res) {
+  var report = req.query.report;
+
+  res.download(
+    path.resolve("server/public/reports/" + report + ".csv"),
+    function(err) {
+      if (err) {
+        console.log(err.message);
+        res.status(404).send("Sorry, report not found.");
       }
     }
   );
