@@ -7,6 +7,7 @@ var bcrypt = require("bcryptjs");
 var path = require("path");
 
 const filesystem = require("fs");
+const reports = require("./reports");
 
 const mysql = require("mysql");
 const config = require("./config.js");
@@ -485,33 +486,114 @@ app.get("/testGetDownloadUrl", function(req, res) {
 
   var report = req.query.report;
   const file = directory + "/server/public/reports/" + report + ".csv";
-  console.log(file);
+  var url = "http://localhost:5000/download-report?report=" + report;
 
-  //Make .csv
-  conn.query(
-    "SELECT Count(*) AS Count, \
-  CONCAT_WS(' ', firstName, lastName) AS Name\
-  FROM awardGiven\
-  INNER JOIN employee ON employee.id=awardGiven.recipientID\
-  GROUP BY employee.id\
-  ORDER BY Count DESC\
-  LIMIT 5",
-    function(err, rows) {
-      if (err) {
-        console.log(err);
-      } else {
-        var data = "Name,Number of awards\n";
-        rows.forEach(function(row) {
-          data = data.concat(row.Name + "," + row.Count + "\n");
-        });
-        filesystem.writeFile(file, data, function(err) {
-          if (err) console.log(err);
-          var url = "http://localhost:5000/download-report?report=" + report;
-          res.json(url);
-        });
-      }
-    }
-  );
+  var sqlStatment = "";
+  switch (report) {
+    case "topRecipients":
+      conn.query(
+        "SELECT Count(*) AS Count, \
+      CONCAT_WS(' ', firstName, lastName) AS Name\
+      FROM awardGiven\
+      INNER JOIN employee ON employee.id=awardGiven.recipientID\
+      GROUP BY employee.id\
+      ORDER BY Count DESC\
+      LIMIT 5",
+        function(err, rows) {
+          if (err) {
+            console.log(err);
+          } else {
+            var data = "Name,Number of awards\n";
+            rows.forEach(function(row) {
+              data = data.concat(row.Name + "," + row.Count + "\n");
+            });
+            filesystem.writeFile(file, data, function(err) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              } else res.json(url);
+            });
+          }
+        }
+      );
+      break;
+    case "topGivers":
+      conn.query(
+        "SELECT Count(*) AS Count, \
+      CONCAT_WS(' ', firstName, lastName) AS Name\
+      FROM awardGiven\
+      INNER JOIN user ON user.id=awardGiven.creatorID\
+      GROUP BY user.id\
+      ORDER BY Count DESC\
+      LIMIT 5",
+        function(err, rows) {
+          if (err) {
+            console.log(err);
+          } else {
+            var data = "Name,Number of awards\n";
+            rows.forEach(function(row) {
+              data = data.concat(row.Name + "," + row.Count + "\n");
+            });
+            filesystem.writeFile(file, data, function(err) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              } else res.json(url);
+            });
+          }
+        }
+      );
+      break;
+    case "awardsByMonth":
+      conn.query(
+        'SELECT MONTHNAME(awardGiven.date) as Month, COUNT(*) as Awards\
+      FROM awardrecognition.awardGiven\
+      WHERE YEAR(awardGiven.date) = "2018"\
+      GROUP BY MONTH(awardGiven.date)',
+        function(err, rows) {
+          if (err) {
+            console.log(err);
+          } else {
+            var data = "Month,Number of awards\n";
+            rows.forEach(function(row) {
+              data = data.concat(row.Month + "," + row.Awards + "\n");
+            });
+            filesystem.writeFile(file, data, function(err) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              } else res.json(url);
+            });
+          }
+        }
+      );
+      break;
+    case "awardsByYear":
+      conn.query(
+        "SELECT YEAR(awardGiven.date) as Year, COUNT(*) as Awards\
+      FROM awardrecognition.awardGiven\
+      GROUP BY YEAR(awardGiven.date)",
+        function(err, rows) {
+          if (err) {
+            console.log(err);
+          } else {
+            var data = "Year,Number of awards\n";
+            rows.forEach(function(row) {
+              data = data.concat(row.Year.toString() + "," + row.Awards + "\n");
+            });
+            filesystem.writeFile(file, data, function(err) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              } else res.json(url);
+            });
+          }
+        }
+      );
+      break;
+    default:
+      res.status(404).send("Report not found!");
+  }
 });
 
 //Once the frontend has called the first download GET to ensure the file exists, this can be called to download the file
