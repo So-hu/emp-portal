@@ -128,29 +128,61 @@ class CreateAwardForm extends Component {
     const isValid = this.validate();
     if (isValid) {
       console.log(this.state);
+        //valid input
+        fetch("/user/addAward", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-      //valid input
-      fetch("/user/addAward", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          awardTypeID: this.state.awardClass,
-          date: this.state.sendDate,
-          time: this.state.sendTime,
-          firstName: this.state.employeeFirstName,
-          lastName: this.state.employeeLastName,
-          email: this.state.employeeEmail
+          body: JSON.stringify({
+            awardTypeID: this.state.awardClass,
+            date: this.state.sendDate,
+            time: this.state.sendTime,
+            firstName: this.state.employeeFirstName,
+            lastName: this.state.employeeLastName,
+            email: this.state.employeeEmail
+          })
+        }).then(res => {
+          return res.text();
         })
-      }).then(res => {
-        return res.text();
-      });
-
-      //clear form
-      this.setState(initialState);
-    }
+        .then(message => {
+          if (message === "User not found") {
+            fetch("/user/addEmployee", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                firstName: this.state.employeeFirstName,
+                lastName: this.state.employeeLastName,
+                email: this.state.employeeEmail
+              })
+            })
+                fetch("/user/addAward", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+          
+                  body: JSON.stringify({
+                    awardTypeID: this.state.awardClass,
+                    date: this.state.sendDate,
+                    time: this.state.sendTime,
+                    firstName: this.state.employeeFirstName,
+                    lastName: this.state.employeeLastName,
+                    email: this.state.employeeEmail
+                  })
+                }).then(res => {
+                  return res.text();
+                })
+            //clear form
+            this.setState(initialState);
+          }
+          //clear form
+          this.setState(initialState);
+        });
+      }
   };
 
   render() {

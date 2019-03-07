@@ -12,7 +12,7 @@ class Summary extends Component{
 	}
 
     render(){
-        console.log("this " + this.state.awards);
+        //console.log("this " + this.state.awards);
         return(
             <div>
                 <div>

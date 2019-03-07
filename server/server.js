@@ -133,6 +133,7 @@ app.post("/user/addAward", function(req, res) {
               res.send(msg);
             } else {
               msg = "Award successfully granted.";
+              console.log("Award successfully granted.");
               res.send(msg);
             }
           }
@@ -402,9 +403,7 @@ app.get("/user/employeesonsystem", function(req, res) {
         console.log(err);
         res.send("Error getting top employees from database.");
       } else {
-        console.log("Server 1: " + rows[0].firstName); 
         var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName }))
-        //console.log("Server: " + data[0].firstName + " " + data[0].id);
         res.json(data);
       }
     }
@@ -412,7 +411,6 @@ app.get("/user/employeesonsystem", function(req, res) {
 });
 
 app.get("/user/getemployee", function(req, res) {
-  console.log("this id as sent: " + req.query.id);
   conn.query(
   "SELECT id, firstName, lastName, email FROM employee WHERE id=?",
   [req.query.id],
@@ -421,10 +419,75 @@ app.get("/user/getemployee", function(req, res) {
         console.log(err);
         res.send("Error getting employee from database.");
       } else {
-        console.log("Server 1100: " + rows[0].firstName); 
         var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName, email: x.email }))
-        //console.log("Server: " + data[0].firstName + " " + data[0].id);
         res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/user/account", function(req, res) {
+  conn.query(
+  "SELECT id, firstName, lastName, email, password FROM user WHERE id=?",
+  [req.query.id],
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting employee from database.");
+      } else {
+        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName, email: x.email, password: x.password }))
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.post("/user/account", function(req, res) {
+  var changes = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email
+  };
+  if (req.body.password != "") {
+    changes.password = req.body.password;
+  }
+  conn.query(
+    "UPDATE user SET ?  WHERE id = ?",
+    [changes, req.body.id],
+    function(err) {
+      if (err) {
+        console.log(err);
+        res.send(err);
+      } else {
+        res.send("Successfully updated user");
+      }
+    }
+  );
+});
+
+app.post("/user/addEmployee", function(req, res) {
+  conn.query(
+    "INSERT INTO employee (firstName, lastName, email) VALUES (?, ?, ?)",
+    [req.body.firstName, req.body.lastName, req.body.email],
+    function(err) {
+      if (err) {
+        console.log(err);
+        res.send(err);
+      } 
+      else {
+        conn.query(
+          "SELECT id FROM employee WHERE firstName=? AND lastName=? AND email=?",
+          [req.body.firstName, req.body.lastName, req.body.email],
+            function(err, rows) {
+              if (err) {
+                console.log(err);
+                res.send("Error getting employee from database.");
+              } else {
+                var data = rows[0].id;
+                res.json(data);
+              }
+            }
+        );
       }
     }
   );
