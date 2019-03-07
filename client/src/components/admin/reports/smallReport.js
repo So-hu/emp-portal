@@ -44,11 +44,13 @@ class SmallReport extends Component {
           <div className="col-6">
             <table class="table table-striped">
               <thead>
-                {this.props.data.jsonData
-                  ? this.props.data.jsonData.header.map(header => (
-                      <th>{header}</th>
-                    ))
-                  : "Loading"}
+                <tr>
+                  {this.props.data.jsonData
+                    ? this.props.data.jsonData.header.map(header => (
+                        <th>{header}</th>
+                      ))
+                    : "Loading"}
+                </tr>
               </thead>
               <tbody>
                 {this.props.data.jsonData
