@@ -150,20 +150,37 @@ app.post("/admin/editUser", function(req, res) {
     email: req.body.user
   };
   if (req.body.password != "") {
-    changes.password = req.body.password;
-  }
-  conn.query(
-    "UPDATE user SET ?  WHERE id = ?",
-    [changes, req.body.id],
-    function(err) {
-      if (err) {
-        console.log(err);
-        res.send(err);
-      } else {
-        res.send("Successfully updated user");
+    bcrypt.genSalt(10, function(err, salt) {
+      bcrypt.hash(req.body.password, salt, function(err, hash) {
+        changes.password = hash;
+        conn.query(
+          "UPDATE user SET ?  WHERE id = ?",
+          [changes, req.body.id],
+          function(err) {
+            if (err) {
+              console.log(err);
+              res.send(err);
+            } else {
+              res.send("Successfully updated user");
+            }
+          }
+        );
+      });
+    });
+  } else {
+    conn.query(
+      "UPDATE user SET ?  WHERE id = ?",
+      [changes, req.body.id],
+      function(err) {
+        if (err) {
+          console.log(err);
+          res.send(err);
+        } else {
+          res.send("Successfully updated user");
+        }
       }
-    }
-  );
+    );
+  }
 });
 
 app.post("/admin/deleteUser", function(req, res) {
