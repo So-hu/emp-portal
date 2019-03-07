@@ -4,6 +4,9 @@ var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 var bcrypt = require("bcryptjs");
+var path = require("path");
+
+const filesystem = require("fs");
 
 const mysql = require("mysql");
 const config = require("./config.js");
@@ -101,7 +104,6 @@ app.post("/admin/addUser", function(req, res) {
 app.post("/user/addAward", function(req, res) {
   var msg = "";
   conn.query(
-
     "SELECT id from employee WHERE firstName=? AND lastName=? AND email=?",
     [req.body.firstName, req.body.lastName, req.body.email],
     function(err, result) {
@@ -194,11 +196,14 @@ app.get("/report/topRecipients", function(req, res) {
         data = {
           chartTitle: "Top 5 Award Winners",
           chartHTitle: "Number of awards",
-          chartData: [["", "Number of awards"]]
+          chartData: [["Name", "Number of awards"]],
+          jsonData: { header: ["Name", "Number of awards"], rows: [] }
         };
         rows.forEach(function(e) {
           data.chartData.push([e.Name, e.Count]);
+          data.jsonData["rows"].push([e.Name, e.Count]);
         });
+        console.log(data);
         res.json(data);
       }
     }
@@ -222,10 +227,12 @@ app.get("/report/topGivers", function(req, res) {
         data = {
           chartTitle: "Top 5 Award Givers",
           chartHTitle: "Number of awards",
-          chartData: [["", "Number of awards"]]
+          chartData: [["Name", "Number of awards"]],
+          jsonData: { header: ["Name", "Number of awards"], rows: [] }
         };
         rows.forEach(function(e) {
           data.chartData.push([e.Name, e.Count]);
+          data.jsonData["rows"].push([e.Name, e.Count]);
         });
         res.json(data);
       }
@@ -247,10 +254,12 @@ app.get("/report/awardsByMonth", function(req, res) {
         data = {
           chartTitle: "Awards by Month",
           chartHTitle: "Month",
-          chartData: [["Month", "Number of awards"]]
+          chartData: [["Month", "Number of awards"]],
+          jsonData: { header: ["Month", "Number of awards"], rows: [] }
         };
         rows.forEach(function(e) {
           data.chartData.push([e.Month, e.Awards]);
+          data.jsonData["rows"].push([e.Month, e.Awards]);
         });
         res.json(data);
       }
@@ -271,10 +280,12 @@ app.get("/report/awardsByYear", function(req, res) {
         data = {
           chartTitle: "Awards by Year",
           chartHTitle: "Year",
-          chartData: [["Year", "Number of awards"]]
+          chartData: [["Year", "Number of awards"]],
+          jsonData: { header: ["Year", "Number of awards"], rows: [] }
         };
         rows.forEach(function(e) {
           data.chartData.push([e.Year.toString(), e.Awards]);
+          data.jsonData["rows"].push([e.Year.toString(), e.Awards]);
         });
 
         res.json(data);
@@ -395,34 +406,43 @@ app.get("/user/summary", function(req, res) {
 });
 
 app.get("/user/employeesonsystem", function(req, res) {
-  conn.query(
-  "SELECT id, firstName, lastName, email FROM employee",
-    function(err, rows) {
-      if (err) {
-        console.log(err);
-        res.send("Error getting top employees from database.");
-      } else {
-        console.log("Server 1: " + rows[0].firstName); 
-        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName }))
-        //console.log("Server: " + data[0].firstName + " " + data[0].id);
-        res.json(data);
-      }
+  conn.query("SELECT id, firstName, lastName, email FROM employee", function(
+    err,
+    rows
+  ) {
+    if (err) {
+      console.log(err);
+      res.send("Error getting top employees from database.");
+    } else {
+      console.log("Server 1: " + rows[0].firstName);
+      var data = rows.map(x => ({
+        id: x.id,
+        firstName: x.firstName,
+        lastName: x.lastName
+      }));
+      //console.log("Server: " + data[0].firstName + " " + data[0].id);
+      res.json(data);
     }
-  );
+  });
 });
 
 app.get("/user/getemployee", function(req, res) {
   console.log("this id as sent: " + req.query.id);
   conn.query(
-  "SELECT id, firstName, lastName, email FROM employee WHERE id=?",
-  [req.query.id],
+    "SELECT id, firstName, lastName, email FROM employee WHERE id=?",
+    [req.query.id],
     function(err, rows) {
       if (err) {
         console.log(err);
         res.send("Error getting employee from database.");
       } else {
-        console.log("Server 1100: " + rows[0].firstName); 
-        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName, email: x.email }))
+        console.log("Server 1100: " + rows[0].firstName);
+        var data = rows.map(x => ({
+          id: x.id,
+          firstName: x.firstName,
+          lastName: x.lastName,
+          email: x.email
+        }));
         //console.log("Server: " + data[0].firstName + " " + data[0].id);
         res.json(data);
       }
@@ -454,6 +474,137 @@ app.post("/userAuth", function(req, res) {
           }
           res.json(result);
         });
+      }
+    }
+  );
+});
+
+//Front end calls this function to construct the .csv, and send a download url
+app.get("/getDownloadUrl", function(req, res) {
+  const directory = path.join(__dirname, "../");
+
+  var report = req.query.report;
+  const file = directory + "/server/public/reports/" + report + ".csv";
+  var url = "http://localhost:5000/download-report?report=" + report;
+
+  var sqlStatment = "";
+  switch (report) {
+    case "topRecipients":
+      conn.query(
+        "SELECT Count(*) AS Count, \
+      CONCAT_WS(' ', firstName, lastName) AS Name\
+      FROM awardGiven\
+      INNER JOIN employee ON employee.id=awardGiven.recipientID\
+      GROUP BY employee.id\
+      ORDER BY Count DESC\
+      LIMIT 5",
+        function(err, rows) {
+          if (err) {
+            console.log(err);
+          } else {
+            var data = "Name,Number of awards\n";
+            rows.forEach(function(row) {
+              data = data.concat(row.Name + "," + row.Count + "\n");
+            });
+            filesystem.writeFile(file, data, function(err) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              } else res.json(url);
+            });
+          }
+        }
+      );
+      break;
+    case "topGivers":
+      conn.query(
+        "SELECT Count(*) AS Count, \
+      CONCAT_WS(' ', firstName, lastName) AS Name\
+      FROM awardGiven\
+      INNER JOIN user ON user.id=awardGiven.creatorID\
+      GROUP BY user.id\
+      ORDER BY Count DESC\
+      LIMIT 5",
+        function(err, rows) {
+          if (err) {
+            console.log(err);
+          } else {
+            var data = "Name,Number of awards\n";
+            rows.forEach(function(row) {
+              data = data.concat(row.Name + "," + row.Count + "\n");
+            });
+            filesystem.writeFile(file, data, function(err) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              } else res.json(url);
+            });
+          }
+        }
+      );
+      break;
+    case "awardsByMonth":
+      conn.query(
+        'SELECT MONTHNAME(awardGiven.date) as Month, COUNT(*) as Awards\
+      FROM awardrecognition.awardGiven\
+      WHERE YEAR(awardGiven.date) = "2018"\
+      GROUP BY MONTH(awardGiven.date)',
+        function(err, rows) {
+          if (err) {
+            console.log(err);
+          } else {
+            var data = "Month,Number of awards\n";
+            rows.forEach(function(row) {
+              data = data.concat(row.Month + "," + row.Awards + "\n");
+            });
+            filesystem.writeFile(file, data, function(err) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              } else res.json(url);
+            });
+          }
+        }
+      );
+      break;
+    case "awardsByYear":
+      conn.query(
+        "SELECT YEAR(awardGiven.date) as Year, COUNT(*) as Awards\
+      FROM awardrecognition.awardGiven\
+      GROUP BY YEAR(awardGiven.date)",
+        function(err, rows) {
+          if (err) {
+            console.log(err);
+          } else {
+            var data = "Year,Number of awards\n";
+            rows.forEach(function(row) {
+              data = data.concat(row.Year.toString() + "," + row.Awards + "\n");
+            });
+            filesystem.writeFile(file, data, function(err) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              } else res.json(url);
+            });
+          }
+        }
+      );
+      break;
+    default:
+      res.status(404).send("Report not found!");
+  }
+});
+
+//Once the frontend has called the first download GET to ensure the file exists, this can be called to download the file
+app.get("/download-report", function(req, res) {
+  var report = req.query.report;
+
+  res.download(
+    path.resolve("server/public/reports/" + report + ".csv"),
+    function(err) {
+      if (err) {
+        console.log(err.message);
+        res.status(404).send("Sorry, report not found.");
       }
     }
   );
