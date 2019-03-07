@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Chart from "react-google-charts";
-import { NavLink } from "react-router-dom";
 
 class SmallReport extends Component {
   state = {
@@ -12,7 +11,6 @@ class SmallReport extends Component {
   }
 
   openDownloadWindow = url => {
-    console.log(url);
     window.open(url);
   };
 
@@ -25,7 +23,7 @@ class SmallReport extends Component {
 
   render() {
     return (
-      <div className="smallReport">
+      <div className="container-fluid">
         <div className="row">
           <div className="col-6">
             <Chart
@@ -44,8 +42,28 @@ class SmallReport extends Component {
             />
           </div>
           <div className="col-6">
+            <table class="table table-striped">
+              <thead>
+                {this.props.data.jsonData
+                  ? this.props.data.jsonData.header.map(header => (
+                      <th>{header}</th>
+                    ))
+                  : "Loading"}
+              </thead>
+              <tbody>
+                {this.props.data.jsonData
+                  ? this.props.data.jsonData.rows.map(row => (
+                      <tr>
+                        {row.map(item => (
+                          <td>{item}</td>
+                        ))}
+                      </tr>
+                    ))
+                  : "Loading Data Table..."}
+              </tbody>
+            </table>
             <button onClick={this.getDownload} className="btn btn-secondary">
-              Download
+              Download .csv
             </button>
           </div>
         </div>
