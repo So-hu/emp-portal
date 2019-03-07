@@ -7,7 +7,6 @@ var bcrypt = require("bcryptjs");
 var path = require("path");
 
 const filesystem = require("fs");
-const reports = require("./reports");
 
 const mysql = require("mysql");
 const config = require("./config.js");
