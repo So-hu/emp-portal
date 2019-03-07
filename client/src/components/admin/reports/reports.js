@@ -71,42 +71,36 @@ class Reports extends Component {
       <div className="reportsPage container-fluid">
         <h1>Default Reports</h1>
         <div className="row">
-          <div className="col">
-            <div className="row">
-              <SmallReport
-                data={this.state.data1}
-                type="BarChart"
-                target="topRecipients"
-                getData={this.getData1}
-              />
-            </div>
-            <div className="row">
-              <SmallReport
-                data={this.state.data2}
-                type="BarChart"
-                target="topGivers"
-                getData={this.getData2}
-              />
-            </div>
-          </div>
-          <div className="col">
-            <div className="row">
-              <SmallReport
-                data={this.state.data3}
-                type="ColumnChart"
-                target="awardsByMonth"
-                getData={this.getData3}
-              />
-            </div>
-            <div className="row">
-              <SmallReport
-                data={this.state.data4}
-                type="ColumnChart"
-                target="awardsByYear"
-                getData={this.getData4}
-              />
-            </div>
-          </div>
+          <SmallReport
+            data={this.state.data1}
+            type="BarChart"
+            target="topRecipients"
+            getData={this.getData1}
+          />
+        </div>
+        <div className="row">
+          <SmallReport
+            data={this.state.data2}
+            type="BarChart"
+            target="topGivers"
+            getData={this.getData2}
+          />
+        </div>
+        <div className="row">
+          <SmallReport
+            data={this.state.data3}
+            type="ColumnChart"
+            target="awardsByMonth"
+            getData={this.getData3}
+          />
+        </div>
+        <div className="row">
+          <SmallReport
+            data={this.state.data4}
+            type="ColumnChart"
+            target="awardsByYear"
+            getData={this.getData4}
+          />
         </div>
       </div>
     );
