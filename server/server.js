@@ -480,7 +480,7 @@ app.post("/userAuth", function(req, res) {
 });
 
 //Front end calls this function to construct the .csv, and send a download url
-app.get("/testGetDownloadUrl", function(req, res) {
+app.get("/getDownloadUrl", function(req, res) {
   const directory = path.join(__dirname, "../");
 
   var report = req.query.report;

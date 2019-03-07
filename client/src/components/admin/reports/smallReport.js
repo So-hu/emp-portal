@@ -15,7 +15,7 @@ class SmallReport extends Component {
   };
 
   getDownload = () => {
-    var getDownLoadUrl = "/testGetDownloadUrl?report=" + this.props.target;
+    var getDownLoadUrl = "/getDownloadUrl?report=" + this.props.target;
     fetch(getDownLoadUrl)
       .then(res => res.json())
       .then(url => this.openDownloadWindow(url));
