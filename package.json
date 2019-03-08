@@ -18,6 +18,8 @@
     "mysql": "^2.16.0",
     "node-latex": "^2.4.4",
     "nodemailer": "^5.1.1",
-    "nodemon": "^1.18.9"
+    "nodemon": "^1.18.9",
+    "replace": "^1.1.0",
+    "replace-in-file": "^3.4.4"
   }
 }
