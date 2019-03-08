@@ -9,14 +9,8 @@ lmargin=.5cm,rmargin=.5cm}
 \usepackage{xcolor}
 \usepackage{multicol}
 \usepackage{ulem}
-\usepackage{datatool}
 
 \begin{document}
-
-\DTLloaddb{awardInformation}{data.csv}
-\DTLforeach{awardInformation} {
-\recipientFirstName=recipientFirstName, \recipientLastName=recipientLastName, \senderFirstName=senderFirstName, \senderLastName=senderLastName, \awardDate=awardDate,
-\awardName=awardType}
 
 \centering
 \scalebox{3}{\color{blue}
@@ -35,12 +29,12 @@ As a thank you for your outstanding performance and dedication, we hereby recogn
 
 \smallskip
 
-{\large \textsc{\awardName}}
+{\large \textsc{awardName}}
 
 \vspace{2mm}
 
 
-\tiny to: \uline{\textcolor{black}{\sc {\recipientFirstName} {\recipientLastName}}}
+\tiny to: \uline{\textcolor{black}{\sc {recipientFirstName} {recipientLastName}}}
 
 
 \vspace{5mm}
@@ -48,8 +42,8 @@ As a thank you for your outstanding performance and dedication, we hereby recogn
 {\color{red}
 \scalebox{0.9}{
 \begin{tabular}{ccc}
-\\ {\senderSignature} && {\awardDate}
-\\ {\sc$\overline{{\senderFirstName} {\senderLastName}}$} &&
+\\ {senderSignature} && {awardDate}
+\\ {\sc$\overline{{senderFirstName} {senderLastName}}$} &&
 $\overline{Date Awarded}$ \\
 \end{tabular}
 }}}}

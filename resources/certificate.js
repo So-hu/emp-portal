@@ -5,6 +5,8 @@
 // Path for Directory
 const path = require('path');
 const directory = path.join(__dirname, '../');
+const fs = require('fs');
+const replace = require('replace-in-file')
 
 // Node Add-on
 const latex = require(directory + 'node_modules/node-latex');
@@ -85,36 +87,45 @@ function awardTypeInfo(conn, awardInformation, awardID) {
         awardInformation.awardType = row.name;
         awardInformation.awardDescription = row.description;
         
-        createCSV(awardInformation, awardID);
+        createLatex(awardInformation, awardID);
     });
 }
 
+function writeVar(file, placeholder, text) {
+    const options = {
+        files: file,
+        from: placeholder,
+        to: text,
+    };
+    try {
+        const changes = replace.sync(options);
+        console.log('Modified files:', changes.join(', '));
+      }
+      catch (error) {
+        console.error('Error occurred:', error);
+      }
+}
 /************************************************
 ** Create CSV for LaTex
 ************************************************/
-function createCSV(awardInformation, awardID) {
-    const filesystem = require('fs');
-    var file = directory + 'resources/data.csv';
-    
-    var rows = "senderFirstName,senderLastName,recipientFirstName,recipientLastName,recipientEmail,awardType,awardDate\n";
-    
+function createLatex(awardInformation, awardID) {
+    var f = directory + 'resources/awards/' + awardInformation.recipientEmail + '.tex';
+    fs.copyFile('certification.tex', f, (err) => {
+        if (err) throw err;
+    });
+
     // First row - head
 //    var row = "senderFirstName,senderLastName,recipientFirstName,recipientLastName,recipientEmail,awardType,senderSignature,awardDate\n"
-    
-    rows += awardInformation.creatorFirstName + "," + awardInformation.creatorLastName + "," + awardInformation.recipientFirstName + "," + awardInformation.recipientLastName + "," + awardInformation.recipientEmail + "," + awardInformation.awardType + "," + awardInformation.awardDate;
-    
-    // Insert award info
-//    rows += awardInformation.creatorFirstName + "," + awardInformation.creatorLastName + "," + awardInformation.recipientFirstName + "," + awardInformation.recipientLastName + "," + awardInformation.recipientEmail + "," + awardInformation.awardType + "," + awardInformation.creatorSignature + "," + awardInformation.awardDate;
-    
-    // Write to CSV file
-    filesystem.writeFile(file, rows, function(error) {
-        if (error)
-            throw error;
-        
-        // Convert to PDF
-        convertToPDF(filesystem, awardInformation, awardID);
-//        sendEmail(awardID);
-    })
+
+    writeVar(f, "senderFirstName", awardInformation.creatorFirstName)
+    writeVar(f, "senderLastName", awardInformation.creatorLastName)
+    writeVar(f, "recipientFirstName", awardInformation.recipientFirstName)
+    writeVar(f, "recipientLastName", awardInformation.recipientLastName)
+    writeVar(f, "awardName", awardInformation.awardType)
+    writeVar(f, "awardDate", awardInformation.awardDate)
+    writeVar(f, "senderSignature", "'" + awardInformation.senderSignature + "'")
+
+    convertToPDF(fs, awardInformation, awardID)
 }
 
 
@@ -124,14 +135,15 @@ function createCSV(awardInformation, awardID) {
 ************************************************/
 function convertToPDF(filesystem, awardInformation, awardID) {
     console.log("Converting to PDF\n");
-    const input = filesystem.createReadStream(directory + 'resources/certification.tex');
-//    const output = filesystem.createWriteStream(directory + 'resources/awards/' + awardID + '.pdf');
+    const input = filesystem.createReadStream(directory + 'resources/awards/' + awardInformation.recipientEmail + '.tex');
+    const output = filesystem.createWriteStream(directory + 'resources/awards/' + awardID + '.pdf');
     
     console.log("Latex input\n");
     const pdf = latex(input);
+    pdf.pipe(output)
+    pdf.on('error', err=> console.log(err))
     
-    
-    console.log(directory + 'resources/\n');
+    /*console.log(directory + 'resources/\n');
     pdf.pipe(filesystem.createWriteStream(directory + 'resources/awards/' + awardID + '.pdf'));
     
     pdf.on('error', function(error) {
@@ -143,7 +155,7 @@ function convertToPDF(filesystem, awardInformation, awardID) {
     pdf.on('finish', function(error) {
         console.log("PDF Finished\n");
         sendEmail(awardID);
-    })
+    })*/
 }
 
 
@@ -154,4 +166,3 @@ function sendEmail(awardID) {
     const email = require('./email.js')
     email(awardID);
 } 
-
