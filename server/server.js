@@ -13,7 +13,6 @@ const config = require("./config.js");
 var conn = mysql.createConnection(config);
 
 // Path for Directory
-const path = require('path');
 const directory = path.join(__dirname, '../');
 
 conn.connect(function(err) {

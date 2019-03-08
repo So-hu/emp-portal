@@ -15,8 +15,8 @@ lmargin=.5cm,rmargin=.5cm}
 
 \DTLloaddb{awardInformation}{data.csv}
 \DTLforeach{awardInformation} {
-\recipientFirstName=recipientFirstName, \recipientLastName=recipientLastName, \creatorFirstName=creatorFirstName, \creatorLastName=creatorLastName, \awardDate=awardDate,
-\awardName=awardName}
+\recipientFirstName=recipientFirstName, \recipientLastName=recipientLastName, \senderFirstName=senderFirstName, \senderLastName=senderLastName, \awardDate=awardDate,
+\awardName=awardType}
 
 \centering
 \scalebox{3}{\color{blue}
@@ -48,8 +48,8 @@ As a thank you for your outstanding performance and dedication, we hereby recogn
 {\color{red}
 \scalebox{0.9}{
 \begin{tabular}{ccc}
-\\ {\creatorSignature} && {\awardDate}
-\\ {\sc$\overline{{\creatorFirstName} {\creatorLastName}}$} &&
+\\ {\senderSignature} && {\awardDate}
+\\ {\sc$\overline{{\senderFirstName} {\senderLastName}}$} &&
 $\overline{Date Awarded}$ \\
 \end{tabular}
 }}}}

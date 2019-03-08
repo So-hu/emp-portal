@@ -112,8 +112,8 @@ function createCSV(awardInformation, awardID) {
             throw error;
         
         // Convert to PDF
-//        convertToPDF(filesystem, awardInformation, awardID);
-        sendEmail(awardID);
+        convertToPDF(filesystem, awardInformation, awardID);
+//        sendEmail(awardID);
     })
 }
 

@@ -16,6 +16,8 @@ var emailInformation = {};
 module.exports = sendEmail;
 
 function sendEmail(awardID){
+    
+    console.log("Inside Email");
         
     const mysql = require("mysql");    
     const config = require(directory + 'server/config.js');
@@ -24,8 +26,6 @@ function sendEmail(awardID){
     emailInformation.awardID = awardID;
 
     var sql = "SELECT awardGiven.id, awardGiven.recipientID, e.id, e.firstName, e.lastName, e.email FROM awardGiven LEFT JOIN employee AS e ON awardGiven.recipientID = e.id WHERE awardGiven.id = ?";
-
-    console.log('Going into First Query');
     
     conn.query(sql, awardID, function(error, results) {
         if (error)
@@ -41,8 +41,7 @@ function sendEmail(awardID){
         conn.query(sql, awardID, function(error, results) {
             if(error) 
                 throw error;
-
-            console.log('Inside Second Query');
+            
             var row = JSON.parse(JSON.stringify(results[0]));
             emailInformation.creatorFirstName = row.firstName;
             emailInformation.creatorLastName = row.lastName;
@@ -61,12 +60,12 @@ function createTransporter(emailInformation, awardID) {
         service: 'gmail',
         host: 'stmp.gmail.com',
         auth: {
-            user: '',
-            pass: ''
+            user: 'donotreplyzibalgroup@gmail.com',
+            pass: 'zibalgroup19'
         }
     });
 
-    var company = '';
+    var company = 'donotreplyzibalgroup@gmail.com';
 
     var message = {
         from: company,
@@ -76,7 +75,7 @@ function createTransporter(emailInformation, awardID) {
             '<p>Congratulations, you have been recognized!</p>',
         attachments: {
             filename: awardID + '.pdf',
-            path: directory + '/resources/awards/' + awardID + '.pdf'
+            path: directory + 'resources/awards/' + awardID + '.pdf'
         }
     }
 
