@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import SmallReport from "./smallReport";
+import CustomReport from "./customReport";
 
 class Reports extends Component {
   state = {
@@ -16,7 +17,7 @@ class Reports extends Component {
       .then(
         response =>
           this.setState({ data1: response }, () =>
-            console.log("Data fetched..", response)
+            console.log("Data fetched..")
           ),
         error => {
           this.setState({ dataError: error });
@@ -30,7 +31,7 @@ class Reports extends Component {
       .then(
         response =>
           this.setState({ data2: response }, () =>
-            console.log("Data fetched..", response)
+            console.log("Data fetched..")
           ),
         error => {
           this.setState({ dataError: error });
@@ -44,7 +45,7 @@ class Reports extends Component {
       .then(
         response =>
           this.setState({ data3: response }, () =>
-            console.log("Data fetched..", response)
+            console.log("Data fetched..")
           ),
         error => {
           this.setState({ dataError: error });
@@ -58,7 +59,7 @@ class Reports extends Component {
       .then(
         response =>
           this.setState({ data4: response }, () =>
-            console.log("Data fetched..", response)
+            console.log("Data fetched..")
           ),
         error => {
           this.setState({ dataError: error });
@@ -69,7 +70,9 @@ class Reports extends Component {
   render() {
     return (
       <div className="reportsPage container-fluid">
-        <h1>Default Reports</h1>
+        <div className="row">
+          <CustomReport />
+        </div>
         <div className="row">
           <SmallReport
             data={this.state.data1}
