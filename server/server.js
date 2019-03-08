@@ -13,6 +13,7 @@ const config = require("./config.js");
 var conn = mysql.createConnection(config);
 
 //Using for sending download urls
+//TODO: change to production url
 const baseUrl = "http://localhost:5000";
 
 conn.connect(function(err) {
