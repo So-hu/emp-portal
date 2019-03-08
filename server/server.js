@@ -99,12 +99,11 @@ app.post("/getQueryCsv", function(req, res) {
   if (target === "awards") {
     //build awards string
     sqlQuery =
-      "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
-    employee.lastName as recipientLast, user.firstName as creatorFirst, \
-    user.lastName as creatorLast FROM awardrecognition.awardGiven \
-    JOIN awardType on awardGiven.awardTypeID=awardType.id \
-    JOIN employee on awardGiven.recipientID=employee.id \
-    JOIN user on awardGiven.creatorID=user.id";
+      "SELECT date, awardType.name as type, concat_ws(' ', employee.firstName, employee.lastName) as `Recipient Name`, \
+      concat_ws(' ', user.firstName, user.lastName) as `Creator Name` FROM awardrecognition.awardGiven \
+      JOIN awardType on awardGiven.awardTypeID=awardType.id \
+      JOIN employee on awardGiven.recipientID=employee.id \
+      JOIN user on awardGiven.creatorID=user.id";
 
     var previousWhereClause = false;
     // Add name constraints
@@ -176,7 +175,7 @@ app.post("/getQueryCsv", function(req, res) {
   } else if (target === "employees") {
     //build employees string
     sqlQuery +=
-      "select `Number of Awards`, concat_ws(' ', firstName, lastName) as name from \
+      "select `Number of Awards`, concat_ws(' ', firstName, lastName) as Name from \
     (select count(*) as `Number of Awards`, employee.firstName, employee.lastName from awardGiven\
     join employee on employee.id=awardGiven.recipientID";
 
