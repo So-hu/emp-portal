@@ -463,7 +463,7 @@ app.get("/user/account", function(req, res) {
         console.log(err);
         res.send("Error getting employee from database.");
       } else {
-        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName, email: x.email, password: x.password }))
+        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName, email: x.email }))
         res.json(data);
       }
     }
@@ -474,11 +474,31 @@ app.post("/user/account", function(req, res) {
   var changes = {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
-    email: req.body.email
+    email: req.body.email,
+    password: ""
   };
-  if (req.body.password != "") {
-    changes.password = req.body.password;
+  if (req.body.password != " ") {
+    bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.hash(req.body.password, salt, function(err, hash) {
+    changes.password = hash;
+    console.log("the hash passowrd " + JSON.stringify(changes))
+    //changes.password = req.body.password;
+    conn.query(
+      "UPDATE user SET ?  WHERE id = ?",
+      [changes, req.body.id],
+      function(err) {
+        if (err) {
+          console.log(err);
+          res.send(err);
+        } else {
+          res.send("Successfully updated user");
+        }
+      }
+    );
+    });
+    });
   }
+  else{
   conn.query(
     "UPDATE user SET ?  WHERE id = ?",
     [changes, req.body.id],
@@ -491,6 +511,7 @@ app.post("/user/account", function(req, res) {
       }
     }
   );
+}
 });
 
 app.post("/user/addEmployee", function(req, res) {
