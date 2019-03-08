@@ -38,19 +38,19 @@ class awardsHistory extends Component {
         <table className="table">
           <thead>
             <tr>
-              <th>Month</th>
               <th>Date</th>
-              <th>Year</th>
-              <th>First Name</th>
+              <th>Type</th>
+              <th>Awarded To</th>
             </tr>
           </thead>
           <tbody>
             {this.state.awards.map(awards => (
               <tr>
-                <td>{awards.month}</td>
                 <td>{awards.date}</td>
-                <td>{awards.year}</td>
-                <td>{awards.firstName}</td>
+                <td>{awards.type}</td>
+                <td>
+                  {awards.recipientFirst} {awards.recipientLast}
+                </td>
               </tr>
             ))}
           </tbody>

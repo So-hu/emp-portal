@@ -3,9 +3,3 @@ use commands:
 'npm run client'
 'npm run server'
 while in the root directory on two different terminals, currently runs on port 3000 and 5000.
-
-current hardcoded credentials:
-user: admin
-password: 123
-user: joe
-password: schmoe

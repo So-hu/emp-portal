@@ -1,146 +1,233 @@
 import React, { Component } from "react";
+import "./newAward.css";
 
+//TODO: add error messages from server when user not found
 const initialState = {
-    employeeFirstName: "",
-    employeeLastName: "",
-    employeeEmail: "", 
-    sendDate: "",
-    sendTime: "",
-    awardClass: "month", 
-    firstNameError: "",
-    lastNameError: "",
-    emailError: "",
-    dateError: "",
-    timeError: ""
-}
+  employeeFirstName: "",
+  employeeLastName: "",
+  employeeEmail: "",
+  sendDate: "",
+  sendTime: "",
+  empId: "",
+  awardClass: "",
+  firstNameError: "",
+  lastNameError: "",
+  emailError: "",
+  dateError: "",
+  timeError: "",
+  awardError: "",
+  selectedEmployee: "",
+};
 
 class CreateAwardForm extends Component {
+  state = {
+    initialState,
+    empOnSys: []
+  };
 
-    state = initialState;
+  componentDidMount() {
+    let initialEmployees = [];
+    fetch('/user/employeesonsystem')
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+          initialEmployees = data.map((employee) => { return {id: employee.id, firstName: employee.firstName, lastName: employee.lastName}})
+            this.setState({empOnSys: [{value: " ", display: "(select employee)"}].concat(initialEmployees)});
+        }).catch(error => {
+          console.log(error);
+        });
+  }
 
-    handleChange = (event) => {
-        console.log(event.target.name);
-        this.setState({[event.target.name]: event.target.value});
+  handleChange = event => {
+    console.log(event.target.name);
+    if(event.target.name === "selectedEmployee"){
+      console.log("auto enter data");
+      console.log(this.state);
+
+      //valid input
+      const encodedValue = encodeURIComponent(event.target.value);
+      fetch("/user/getemployee?id=" + event.target.value, {
+        method: "GET"
+      }).then(res => {
+        return res.json();
+        //return res.text();
+      })
+      .then(data => {
+        console.log("Thisi is form the server api: " + data[0].firstName)
+        this.setState({ 
+          employeeFirstName: data[0].firstName, 
+          employeeLastName: data[0].lastName,
+          employeeEmail: data[0].email,
+          sendDate: data[0].sendDate,
+          sendTime: data[0].sendTime,
+          empId: data[0].id,
+         });
+      })
+    }
+    else
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
+  validate = () => {
+    let firstNameError = "";
+    let lastNameError = "";
+    let emailError = "";
+    let awardError = "";
+    let dateError = "";
+    let timeError = "";
+
+    if (!this.state.employeeFirstName) {
+      firstNameError = "First name is required";
     }
 
-    validate = () => {
-        let firstNameError = "";
-        let lastNameError = "";
-        let emailError = "";
-
-        if (!this.state.employeeFirstName){
-            firstNameError = "first name should not be empty!";
-        }
-
-        if (!this.state.employeeLastName){
-            lastNameError = "last name should not be empty!";
-        }
-
-        if (!this.state.employeeEmail.includes('@')){
-            emailError = "invalid email!";
-        }
-
-        if(emailError || firstNameError || lastNameError){
-            this.setState({emailError, firstNameError, lastNameError});
-            return false;
-        }
-
-        return true;
+    if (!this.state.employeeLastName) {
+      lastNameError = "Last name is required";
     }
 
-    handleSubmit = (event) => {
-        event.preventDefault();
-        const isValid = this.validate();
-        if (isValid){
-            console.log(this.state);
-
-            //valid input
-            fetch("/user/addAward", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                month: this.state.sendDate,
-                date: this.state.sendDate,
-                year: this.state.sendDate,
-                time: this.state.sendTime,
-                firstName: this.state.employeeFirstName
-              })
-            })
-
-            .then(res => {
-                return res.text();
-              })
-
-            //clear form
-            this.setState(initialState);
-        }
+    if (!this.state.employeeEmail.includes("@")) {
+      emailError = "Invalid email";
     }
 
-    render(){
-        return ( 
-            <form onSubmit={this.handleSubmit}>
-                <div>
-                    <label>
-                        Employee's First Name:
-                        <input name="employeeFirstName" placeholder="First Name" value={this.state.employeeFirstName} 
-                        onChange={this.handleChange} 
-                        />
-                        <div style={{color: "red", fontSize: 12}}>
-                            {this.state.firstNameError}
-                        </div>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Employee's Last Name:
-                        <input name="employeeLastName" placeholder="Last Name" value={this.state.employeeLastName} 
-                        onChange={this.handleChange} 
-                        />
-                        <div style={{color: "red", fontSize: 12}}>
-                            {this.state.lastNameError}
-                        </div>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Employee's Email:
-                        <input name="employeeEmail" placeHolder="email" value={this.state.employeeEmail} 
-                        onChange={this.handleChange} 
-                        />
-                        <div style={{color: "red", fontSize: 12}}>
-                            {this.state.emailError}
-                        </div>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Award Class:
-                        <select name="awardClass" value={this.state.awardClass} onChange={this.handleChange}>
-                            <option value="month">Employee of the Month</option>
-                            <option value="week">Employee of the Week</option>
-                        </select>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Send Date (MM/DD/YYYY):
-                        <input type="date" name="sendDate" value={this.state.sendDate} onChange={this.handleChange}/>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Send Time (HH:MM AM/PM):
-                        <input type="time" name="sendTime" value={this.state.sendTime} onChange={this.handleChange}/>
-                    </label>
-                </div>
-                <div>
-                    <button type="submit">Create Award</button>
-                </div>
-            </form>
-        )
+    if (!this.state.awardClass) {
+      awardError = "Select award type";
     }
+
+    if (!this.state.sendDate) {
+      dateError = "Enter a send date";
+    }
+
+    if (!this.state.sendTime) {
+      timeError = "Enter a send time";
+    }
+
+    if (
+      emailError ||
+      firstNameError ||
+      lastNameError ||
+      awardError ||
+      dateError ||
+      timeError
+    ) {
+      this.setState({
+        emailError,
+        firstNameError,
+        lastNameError,
+        awardError,
+        dateError,
+        timeError
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  handleSubmit = event => {
+    event.preventDefault();
+    const isValid = this.validate();
+    if (isValid) {
+      console.log(this.state);
+
+      //valid input
+      fetch("/user/addAward", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          awardTypeID: this.state.awardClass,
+          date: this.state.sendDate,
+          time: this.state.sendTime,
+          firstName: this.state.employeeFirstName,
+          lastName: this.state.employeeLastName,
+          email: this.state.employeeEmail
+        })
+      }).then(res => {
+        return res.text();
+      });
+
+      //clear form
+      this.setState(initialState);
+    }
+  };
+
+  render() {
+
+    return (
+      <div class="form-style-6">
+        <h1>Create a New Award</h1>
+        <form onSubmit={this.handleSubmit}>
+          <div>
+            <h6>Select Employee</h6>
+            <select 
+              name="selectedEmployee"
+              value={this.state.selectedEmployee} 
+              //onChange={(e) => this.setState({selectedTeam: e.target.value})}
+              onChange={this.handleChange}
+            >
+              {this.state.empOnSys.map((Emp) => <option key={Emp.id} value={Emp.id}>{Emp.id} {Emp.firstName} {Emp.lastName}</option>)}
+            </select>
+          </div>
+
+          <h6>Or Enter New Employee</h6>
+          <div style={{ color: "red" }}>{this.state.firstNameError}</div>
+          <input
+            type="text"
+            name="employeeFirstName"
+            placeholder="First Name"
+            value={this.state.employeeFirstName}
+            onChange={this.handleChange}
+          />
+          <div style={{ color: "red" }}>{this.state.lastNameError}</div>
+          <input
+            type="text"
+            name="employeeLastName"
+            placeholder="Last Name"
+            value={this.state.employeeLastName}
+            onChange={this.handleChange}
+          />
+          <div style={{ color: "red" }}>{this.state.emailError}</div>
+          <input
+            type="email"
+            name="employeeEmail"
+            placeHolder="Email"
+            value={this.state.employeeEmail}
+            onChange={this.handleChange}
+          />
+          <div style={{ color: "red" }}>{this.state.awardError}</div>
+          <select
+            name="awardClass"
+            value={this.state.awardClass}
+            onChange={this.handleChange}
+          >
+            <option value="" disabled selected>Select Award Type</option>
+            <option value="1">Employee of the Month</option>
+            <option value="2">Employee of the Week</option>
+            <option value="3">Highest Sales in a Month</option>
+          </select>
+          <div style={{ color: "red" }}>{this.state.dateError}</div>
+          Send Date (mm/dd/yyyy):
+          <input
+            type="date"
+            name="sendDate"
+            value={this.state.sendDate}
+            onChange={this.handleChange}
+          />
+          <div style={{ color: "red" }}>{this.state.timeError}</div>
+          Send Time (hh:mm am/pm):
+          <input
+            type="time"
+            name="sendTime"
+            value={this.state.sendTime}
+            onChange={this.handleChange}
+          />
+          <input type="submit" value="Create Award" />
+        </form>
+      </div>
+    );
+  }
 }
 
 export default CreateAwardForm;

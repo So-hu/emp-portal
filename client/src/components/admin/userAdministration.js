@@ -105,7 +105,7 @@ class AdminConsole extends Component {
   handleUserOpenEdit = id => {
     //Todo: implement user edit
     var editUser = this.state.users.find(function(user) {
-      return user.userId === id;
+      return user.id === id;
     });
     console.log(editUser);
     console.log(this.state.users);
@@ -293,9 +293,8 @@ class AdminConsole extends Component {
                 onChange={this.handleChange}
               >
                 <option>Choose...</option>
-                <option>sales</option>
-                <option>supervisor</option>
                 <option>administrator</option>
+                <option>nonadministrator</option>
               </select>
             </div>
             <button className="btn btn-primary">Create</button>

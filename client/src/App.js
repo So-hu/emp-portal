@@ -14,7 +14,7 @@ import { BrowserRouter as Router, Redirect } from "react-router-dom";
 import Route from "react-router-dom/Route";
 import store from "./store/store";
 import AdminConsole from "./components/admin/userAdministration";
-import Reports from "./components/admin/reports";
+import Reports from "./components/admin/reports/reports";
 import awardsHistory from "./components/awards/awardsHistory";
 import Modal from "react-modal";
 
@@ -25,36 +25,15 @@ class App extends Component {
     Modal.setAppElement("#root");
 
     this.state = {
-      loggedIn: false,
-      routes: []
+      loggedIn: store.getState().authenticated,
+      routes: store.getState().routes
     };
 
     store.subscribe(() => {
       this.setState({
-        loggedIn: store.getState().authenticated
+        loggedIn: store.getState().authenticated,
+        routes: store.getState().routes
       });
-      if (store.getState().userClass === "user") {
-        this.setState({
-          routes: [
-            { route: "/homepage", name: "Home" },
-            { route: "/newaward", name: "New Award" },
-            { route: "/awardshistory", name: "Awards History" },
-            { route: "/account", name: "Account" }
-          ]
-        });
-      } else if (store.getState().userClass === "administrator") {
-        this.setState({
-          routes: [
-            { route: "/homepage", name: "Home" },
-            { route: "/user+administration", name: "User Administration" },
-            { route: "/reports", name: "Reports" }
-          ]
-        });
-      } else {
-        this.setState({
-          routes: []
-        });
-      }
     });
   }
 

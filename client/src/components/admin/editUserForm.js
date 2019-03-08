@@ -12,11 +12,12 @@ class EditUserForm extends Component {
     onChange: this.props.handleChange,
     msg: this.props.msg
   };
+
   render() {
     return (
-      <div class="form-group">
-        <form onSubmit={this.state.onUserEdit}>
-          <div className="form-group col-md-6">
+      <div className="form-group">
+        <form className="form-group" onSubmit={this.state.onUserEdit}>
+          <div className="form-group col">
             <div className="form-row">
               <div className="form-group col-md-6">
                 <label>Email</label>
@@ -43,7 +44,7 @@ class EditUserForm extends Component {
               </div>
             </div>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col">
             <label>First Name</label>
             <input
               required
@@ -55,7 +56,7 @@ class EditUserForm extends Component {
               defaultValue={this.state.firstName}
             />
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col">
             <label>Last name</label>
             <input
               required
@@ -67,7 +68,7 @@ class EditUserForm extends Component {
               defaultValue={this.state.lastName}
             />
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col">
             <label>Permissions</label>
             <select
               required
@@ -77,12 +78,13 @@ class EditUserForm extends Component {
               defaultValue={this.state.userClass}
             >
               <option />
-              <option>sales</option>
-              <option>supervisor</option>
               <option>administrator</option>
+              <option>nonadministrator</option>
             </select>
           </div>
-          <button className="btn btn-primary">Save Changes</button>
+          <div className="form-group col">
+            <button className="btn btn-primary">Save Changes</button>
+          </div>
         </form>
         <div>{this.state.msg}</div>
       </div>

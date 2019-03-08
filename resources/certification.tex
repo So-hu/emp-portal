@@ -13,7 +13,7 @@ lmargin=.5cm,rmargin=.5cm}
 
 \begin{document}
 
-\DTLloaddb{awardInformation}{/Users/Murphy/OSU CS/467 Capstone/Project/emp-portal/resources/data.csv}
+\DTLloaddb{awardInformation}{data.csv}
 \DTLforeach{awardInformation} {
 \recipientFirstName=recipientFirstName, \recipientLastName=recipientLastName, \creatorFirstName=creatorFirstName, \creatorLastName=creatorLastName, \awardDate=awardDate,
 \awardName=awardName}

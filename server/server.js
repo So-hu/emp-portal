@@ -3,11 +3,15 @@ const app = express();
 var port = 5000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
+var bcrypt = require("bcryptjs");
 
-//server connection placeholder
 const mysql = require("mysql");
 const config = require("./config.js");
 var conn = mysql.createConnection(config);
+
+// Path for Directory
+const path = require('path');
+const directory = path.join(__dirname, '../');
 
 conn.connect(function(err) {
   if (err) {
@@ -24,7 +28,7 @@ app.get("/", function(req, res) {
 //example server side route function for data fetching
 app.get("/employeeData", function(req, res) {
   conn.query(
-    "select lastName, firstName, email, userClass, accountCreated, userId from user ORDER BY lastName",
+    "select lastName, firstName, email, userClass, accountCreated, id from user ORDER BY lastName",
     function(err, result) {
       if (err) {
         console.log(err);
@@ -35,23 +39,16 @@ app.get("/employeeData", function(req, res) {
   );
 });
 
-app.get("/allAwards", function(req, res) {
-  conn.query(
-    "select awardTypeID, month, date, year, firstName, creatorID from awardGiven ORDER BY firstName",
-    function(err, result) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(result);
-      }
-    }
-  );
-});
-
-//example server side route function for data fetching
+//Get awards history
 app.get("/awardsData", function(req, res) {
   conn.query(
-    "select month, date, year, firstName from awardGiven ORDER BY month",
+    "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+    employee.lastName as recipientLast, user.firstName as creatorFirst, \
+    user.lastName as creatorLast FROM awardrecognition.awardGiven \
+    JOIN awardType on awardGiven.awardTypeID=awardType.id \
+    JOIN employee on awardGiven.recipientID=employee.id \
+    JOIN user on awardGiven.creatorID=user.id \
+    ORDER BY date DESC;",
     function(err, result) {
       if (err) {
         console.log(err);
@@ -76,22 +73,74 @@ app.post("/admin/addUser", function(req, res) {
           .toISOString()
           .slice(0, 19)
           .replace("T", " ");
+        bcrypt.genSalt(10, function(err, salt) {
+          bcrypt.hash(req.body.password, salt, function(err, hash) {
+            conn.query(
+              "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
+              [
+                req.body.userClass,
+                req.body.firstName,
+                req.body.lastName,
+                req.body.user,
+                hash,
+                timestamp
+              ],
+              function(err) {
+                if (err) {
+                  msg = "Email Already in Use";
+                  res.send(msg);
+                } else {
+                  msg = "Successfully Added User";
+                  res.send(msg);
+                }
+              }
+            );
+          });
+        });
+      }
+    }
+  );
+});
+
+app.post("/user/addAward", function(req, res) {
+  var msg = "";
+  conn.query(
+
+    "SELECT id from employee WHERE firstName=? AND lastName=? AND email=?",
+    [req.body.firstName, req.body.lastName, req.body.email],
+    function(err, result) {
+      if (err) {
+        msg = "Error with request";
+        console.log(err);
+        res.send(msg);
+      } else if (result.length == 0) {
+        msg = "User not found";
+        res.send(msg);
+      } else {
+        //Use id from above query to find the recipient
+        recipientID = result[0].id;
+        //TODO: get creatorID from currently logged in user
+        creatorID = 1;
         conn.query(
-          "INSERT INTO user (userClass, firstName, lastName, email, password, accountCreated) VALUES(?,?,?,?,?,?)",
+          "INSERT INTO awardGiven (awardTypeID, recipientID, creatorID, date, time) VALUES(?,?,?,?,?)",
           [
-            req.body.userClass,
-            req.body.firstName,
-            req.body.lastName,
-            req.body.user,
-            req.body.password,
-            timestamp
+            req.body.awardTypeID,
+            recipientID,
+            creatorID,
+            req.body.date,
+            req.body.time
           ],
-          function(err) {
+          function(err, row) {
             if (err) {
-              msg = "Email Already in Use";
+              console.log(err);
+              msg = "Award failed.";
               res.send(msg);
             } else {
-              msg = "Successfully Added User";
+              msg = "Award successfully granted.";
+              var awardID = row.insertId;
+              console.log("Award ID: " + awardID);
+              var certificate = require(directory + '/resources/certificate.js')
+              certificate(awardID);
               res.send(msg);
             }
           }
@@ -101,32 +150,6 @@ app.post("/admin/addUser", function(req, res) {
   );
 });
 
-app.post("/user/addAward", function(req, res) {
-  var msg = "";
-      console.log(req.body);
-        conn.query(
-          "INSERT INTO awardGiven (month, date, year, time, firstName) VALUES(?,?,?,?,?)",
-          [
-            req.body.month,
-            req.body.date,
-            req.body.year,
-            req.body.time,
-            req.body.firstName
-          ],
-          function(err) {
-            if (err) {
-              msg = "Email Already in Use";
-              console.log(err);
-              res.send(msg);
-            } else {
-              msg = "Successfully Added User";
-              console.log(err);
-              res.send(msg);
-            }
-          }
-        );
-});
-  
 app.post("/admin/editUser", function(req, res) {
   var changes = {
     userClass: req.body.userClass,
@@ -138,7 +161,7 @@ app.post("/admin/editUser", function(req, res) {
     changes.password = req.body.password;
   }
   conn.query(
-    "UPDATE user SET ?  WHERE userID = ?",
+    "UPDATE user SET ?  WHERE id = ?",
     [changes, req.body.id],
     function(err) {
       if (err) {
@@ -152,9 +175,7 @@ app.post("/admin/editUser", function(req, res) {
 });
 
 app.post("/admin/deleteUser", function(req, res) {
-  conn.query("DELETE from user WHERE userID = ?", [req.body.userID], function(
-    err
-  ) {
+  conn.query("DELETE from user WHERE id = ?", [req.body.userID], function(err) {
     if (err) {
       res.send(err);
     } else {
@@ -163,20 +184,287 @@ app.post("/admin/deleteUser", function(req, res) {
   });
 });
 
+// Sample report option for top 5 award recipients
+app.get("/report/topRecipients", function(req, res) {
+  conn.query(
+    "SELECT Count(*) AS Count, \
+  CONCAT_WS(' ', firstName, lastName) AS Name\
+  FROM awardGiven\
+  INNER JOIN employee ON employee.id=awardGiven.recipientID\
+  GROUP BY employee.id\
+  ORDER BY Count DESC\
+  LIMIT 5",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting top recipients");
+      } else {
+        data = {
+          chartTitle: "Top 5 Award Winners",
+          chartHTitle: "Number of awards",
+          chartData: [["", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          data.chartData.push([e.Name, e.Count]);
+        });
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/topGivers", function(req, res) {
+  conn.query(
+    "SELECT Count(*) AS Count, \
+  CONCAT_WS(' ', firstName, lastName) AS Name\
+  FROM awardGiven\
+  INNER JOIN user ON user.id=awardGiven.creatorID\
+  GROUP BY user.id\
+  ORDER BY Count DESC\
+  LIMIT 5",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting top recipients");
+      } else {
+        data = {
+          chartTitle: "Top 5 Award Givers",
+          chartHTitle: "Number of awards",
+          chartData: [["", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          data.chartData.push([e.Name, e.Count]);
+        });
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/awardsByMonth", function(req, res) {
+  conn.query(
+    'SELECT MONTHNAME(awardGiven.date) as Month, COUNT(*) as Awards\
+    FROM awardrecognition.awardGiven\
+    WHERE YEAR(awardGiven.date) = "2018"\
+    GROUP BY MONTH(awardGiven.date)',
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardsByMonth");
+      } else {
+        data = {
+          chartTitle: "Awards by Month",
+          chartHTitle: "Month",
+          chartData: [["Month", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          data.chartData.push([e.Month, e.Awards]);
+        });
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/report/awardsByYear", function(req, res) {
+  conn.query(
+    "SELECT YEAR(awardGiven.date) as Year, COUNT(*) as Awards\
+    FROM awardrecognition.awardGiven\
+    GROUP BY YEAR(awardGiven.date)",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardsByYear");
+      } else {
+        data = {
+          chartTitle: "Awards by Year",
+          chartHTitle: "Year",
+          chartData: [["Year", "Number of awards"]]
+        };
+        rows.forEach(function(e) {
+          data.chartData.push([e.Year.toString(), e.Awards]);
+        });
+
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/user/awardsgiven", function(req, res) {
+  //res.json({"total":100});
+  var eom = 0; //employee of the month counter
+  var eow = 0; //employee of the week counter
+  var hsm = 0; //highest sale of the month
+  var unknown = 0;
+
+  conn.query("SELECT awardTypeID FROM awardGiven", function(err, data) {
+    if (err) {
+      console.log(err);
+      res.send("Error getting awardGiven");
+    } else {
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].awardTypeID === 1) {
+          eom++;
+        } else if (data[i].awardTypeID === 2) {
+          eow++;
+        } else if (data[i].awardTypeID === 3) {
+          hsm++;
+        } else {
+          unknown++;
+        }
+      }
+      res.send({ eom, eow, hsm, unknown });
+    }
+  });
+});
+
+app.get("/user/top5employess", function(req, res) {
+  conn.query(
+    "SELECT Count(*) AS Count, \
+      CONCAT_WS(' ', firstName, lastName) AS Name\
+      FROM awardGiven\
+      INNER JOIN employee ON awardGiven.recipientID=employee.id\
+      GROUP BY employee.id\
+      ORDER BY Count DESC\
+      LIMIT 5",
+    function(err, data) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardGiven");
+      } else {
+        data = {
+          employee1: data[0].Name,
+          emp1Awards: data[0].Count,
+          employee2: data[1].Name,
+          emp2Awards: data[1].Count,
+          employee3: data[2].Name,
+          emp3Awards: data[2].Count,
+          employee4: data[3].Name,
+          emp4Awards: data[3].Count,
+          employee5: data[4].Name,
+          emp5Awards: data[4].Count
+        };
+        res.send(data);
+      }
+    }
+  );
+});
+
+//Get awards history
+app.get("/user/awardsData", function(req, res) {
+  conn.query(
+    "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+    employee.lastName as recipientLast \
+    FROM awardrecognition.awardGiven \
+    JOIN awardType on awardGiven.awardTypeID=awardType.id \
+    JOIN employee on awardGiven.recipientID=employee.id \
+    ORDER BY date DESC \
+    LIMIT 5;",
+    function(err, result) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json(result);
+      }
+    }
+  );
+});
+
+//Get awards history
+app.get("/user/summary", function(req, res) {
+  var data;
+  var numEmps;
+  var awardsGiven;
+  conn.query("SELECT Count(*) AS Count FROM employee", function(err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      numEmps = result[0].Count;
+
+      conn.query("SELECT Count(*) AS Count2 FROM awardGiven", function(
+        err,
+        result2
+      ) {
+        if (err) {
+          console.log(err);
+        } else {
+          awardsGiven = result2[0].Count2;
+
+          data = {
+            numEmployees: numEmps,
+            numberAwards: awardsGiven
+          };
+          res.json(data);
+        }
+      });
+    }
+  });
+});
+
+app.get("/user/employeesonsystem", function(req, res) {
+  conn.query(
+  "SELECT id, firstName, lastName, email FROM employee",
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting top employees from database.");
+      } else {
+        console.log("Server 1: " + rows[0].firstName); 
+        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName }))
+        //console.log("Server: " + data[0].firstName + " " + data[0].id);
+        res.json(data);
+      }
+    }
+  );
+});
+
+app.get("/user/getemployee", function(req, res) {
+  console.log("this id as sent: " + req.query.id);
+  conn.query(
+  "SELECT id, firstName, lastName, email FROM employee WHERE id=?",
+  [req.query.id],
+    function(err, rows) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting employee from database.");
+      } else {
+        console.log("Server 1100: " + rows[0].firstName); 
+        var data = rows.map((x) => ({ id: x.id, firstName: x.firstName, lastName: x.lastName, email: x.email }))
+        //console.log("Server: " + data[0].firstName + " " + data[0].id);
+        res.json(data);
+      }
+    }
+  );
+});
+
 //this function will need to return whether the login is valid as well as the userclass.
 app.post("/userAuth", function(req, res) {
   const { user, password } = req.body;
+  /*if(user == "admin"){
+    res.json({valid: true, role: "administrator", msg:""})
+  }*/
   var result = { valid: false, role: "", msg: "" };
-  if (user === "admin" && password === "123") {
-    result.valid = true;
-    result.role = "administrator";
-  } else if (user === "joe" && password === "schmoe") {
-    result.valid = true;
-    result.role = "user";
-  } else {
-    result.msg = "Username and password do not match";
-  }
-  res.json(result);
+  conn.query(
+    "SELECT password, userClass from user WHERE email= ?",
+    [user],
+    function(err, data) {
+      if (data.length == 0) {
+        result.msg = "Username and password do not match";
+        res.json(result);
+      } else {
+        bcrypt.compare(password, data[0].password, function(err, isMatch) {
+          if (isMatch) {
+            result.valid = true;
+            result.role = data[0].userClass;
+          } else {
+            result.msg = "Username and password do not match";
+          }
+          res.json(result);
+        });
+      }
+    }
+  );
 });
 
 app.listen(port, function() {
