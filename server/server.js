@@ -481,7 +481,7 @@ app.post("/user/account", function(req, res) {
     bcrypt.genSalt(10, function(err, salt) {
     bcrypt.hash(req.body.password, salt, function(err, hash) {
     changes.password = hash;
-    console.log("the hash passowrd " + JSON.stringify(changes))
+    //console.log("the hash passowrd " + JSON.stringify(changes))
     //changes.password = req.body.password;
     conn.query(
       "UPDATE user SET ?  WHERE id = ?",
