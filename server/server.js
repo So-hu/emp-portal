@@ -62,8 +62,6 @@ app.get("/awardsData", function(req, res) {
 });
 
 app.post("/getQueryCsv", function(req, res) {
-  console.log(req.body);
-
   const directory = path.join(__dirname, "../");
 
   var fileName = req.body.fileName;
@@ -73,12 +71,26 @@ app.post("/getQueryCsv", function(req, res) {
   var url = baseUrl + "/download-report?report=" + filePrefix;
 
   var target = req.body.target;
-  var nameType = req.body.target;
-  var name = req.body.target;
-  var awardType = req.body.target;
-  var startDate = req.body.target;
-  var endDate = req.body.target;
-  var awardComparator = req.body.target;
+  var nameType = req.body.nameType;
+  var name = req.body.name;
+  var firstName = "";
+  var lastName = "";
+  var nameTryBoth = false;
+  if (name) {
+    if (name.split(" ").length > 1) {
+      firstName = name.split(" ")[0];
+      lastName = name.split(" ")[1];
+    } else {
+      // Attempt to find matching first or last name from providing single name
+      firstName = lastName = name;
+      nameTryBoth = true;
+    }
+  }
+  var awardType = req.body.awardType;
+  var startDate = req.body.startDate;
+  var endDate = req.body.endDate;
+  var awardComparator = req.body.awardComparator;
+  var awardComparisonValue = Number(req.body.awardComparisonValue);
 
   var sqlQuery = "";
 
@@ -92,10 +104,137 @@ app.post("/getQueryCsv", function(req, res) {
     user.lastName as creatorLast FROM awardrecognition.awardGiven \
     JOIN awardType on awardGiven.awardTypeID=awardType.id \
     JOIN employee on awardGiven.recipientID=employee.id \
-    JOIN user on awardGiven.creatorID=user.id \
-    ORDER BY date DESC;";
+    JOIN user on awardGiven.creatorID=user.id";
+
+    var previousWhereClause = false;
+    // Add name constraints
+    if (nameType && name) {
+      if (nameType === "recipient") {
+        if (nameTryBoth) {
+          sqlQuery +=
+            " WHERE (employee.firstName=" +
+            conn.escape(name) +
+            " OR employee.lastName=" +
+            conn.escape(name) +
+            ")";
+        } else {
+          sqlQuery +=
+            " WHERE employee.firstName=" +
+            conn.escape(firstName) +
+            " AND employee.lastName=" +
+            conn.escape(lastName);
+        }
+        previousWhereClause = true;
+      } else if (nameType === "creator") {
+        if (nameTryBoth) {
+          sqlQuery +=
+            " WHERE (user.firstName=" +
+            conn.escape(name) +
+            " OR user.lastName=" +
+            conn.escape(name) +
+            ")";
+        } else {
+          sqlQuery +=
+            " WHERE user.firstName=" +
+            conn.escape(firstName) +
+            " AND user.lastName=" +
+            conn.escape(lastName);
+        }
+        previousWhereClause = true;
+      }
+    }
+
+    //Add award type constraints
+    if (awardType) {
+      if (previousWhereClause) {
+        sqlQuery += " AND awardType.id=" + conn.escape(awardType);
+      } else {
+        sqlQuery += " WHERE awardType.id=" + conn.escape(awardType);
+        previousWhereClause = true;
+      }
+    }
+
+    //Add date constraints
+    if (startDate) {
+      if (previousWhereClause) {
+        sqlQuery += " AND date >" + conn.escape(startDate);
+      } else {
+        sqlQuery += " WHERE date >" + conn.escape(startDate);
+        previousWhereClause = true;
+      }
+    }
+    if (endDate) {
+      if (previousWhereClause) {
+        sqlQuery += " AND date <" + conn.escape(endDate);
+      } else {
+        sqlQuery += " WHERE date <" + conn.escape(endDate);
+        previousWhereClause = true;
+      }
+    }
+
+    sqlQuery += " ORDER BY date DESC";
   } else if (target === "employees") {
     //build employees string
+    sqlQuery +=
+      "select `Number of Awards`, concat_ws(' ', firstName, lastName) as name from \
+    (select count(*) as `Number of Awards`, employee.firstName, employee.lastName from awardGiven\
+    join employee on employee.id=awardGiven.recipientID";
+
+    var previousWhereClause = false;
+    // Add name constraints
+    if (name) {
+      if (nameTryBoth) {
+        sqlQuery +=
+          " WHERE (employee.firstName=" +
+          conn.escape(name) +
+          " OR employee.lastName=" +
+          conn.escape(name) +
+          ")";
+      } else {
+        sqlQuery +=
+          " WHERE employee.firstName=" +
+          conn.escape(firstName) +
+          " AND employee.lastName=" +
+          conn.escape(lastName);
+      }
+      previousWhereClause = true;
+    }
+
+    //End additions to derived table part of query, so we're working with a new set of where clauses
+    sqlQuery += " group by employee.id) as t";
+    previousWhereClause = false;
+
+    //Add award constraints
+    if (awardComparator && awardComparisonValue) {
+      if (awardComparator === "<") {
+        if (previousWhereClause) {
+          sqlQuery +=
+            " AND `Number of Awards`<" + conn.escape(awardComparisonValue);
+        } else {
+          sqlQuery +=
+            " WHERE `Number of Awards`<" + conn.escape(awardComparisonValue);
+        }
+      } else if (awardComparator === ">") {
+        if (previousWhereClause) {
+          sqlQuery +=
+            " AND `Number of Awards`>" + conn.escape(awardComparisonValue);
+        } else {
+          sqlQuery +=
+            " WHERE `Number of Awards`>" + conn.escape(awardComparisonValue);
+        }
+      } else if (awardComparator === "=") {
+        if (previousWhereClause) {
+          sqlQuery +=
+            " AND `Number of Awards`=" + conn.escape(awardComparisonValue);
+        } else {
+          sqlQuery +=
+            " WHERE `Number of Awards`=" + conn.escape(awardComparisonValue);
+        }
+      }
+      previousWhereClause = true;
+    }
+
+    sqlQuery += " ORDER BY `Number of Awards` DESC";
   }
 
   //call sql query, then construct csv
