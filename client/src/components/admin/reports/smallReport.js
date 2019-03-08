@@ -42,14 +42,14 @@ class SmallReport extends Component {
             />
           </div>
           <div className="col-6">
-            <table class="table table-striped">
+            <table className="table table-striped">
               <thead>
                 <tr>
                   {this.props.data.jsonData
                     ? this.props.data.jsonData.header.map(header => (
                         <th>{header}</th>
                       ))
-                    : "Loading"}
+                    : null}
                 </tr>
               </thead>
               <tbody>
@@ -61,7 +61,7 @@ class SmallReport extends Component {
                         ))}
                       </tr>
                     ))
-                  : "Loading Data Table..."}
+                  : null}
               </tbody>
             </table>
             <button onClick={this.getDownload} className="btn btn-secondary">
