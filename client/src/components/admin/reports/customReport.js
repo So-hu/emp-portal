@@ -7,8 +7,8 @@ class CustomReport extends Component {
       { displayName: "Employees", value: "employees" }
     ],
     awardParams: [
-      { displayName: "Recipient Name", value: "recipientName" },
-      { displayName: "Awarded By Name", value: "creatorName" }
+      { displayName: "Recipient Name", value: "recipient" },
+      { displayName: "Awarded By Name", value: "creator" }
     ],
     employeeParams: [{ displayName: "Name", value: "name" }],
     // Todo: make these award options populate from the server
@@ -105,7 +105,7 @@ class CustomReport extends Component {
             >
               <option />
               {this.state.awardTypes.map(type => (
-                <option value={type.id}>{type.displayName}</option>
+                <option value={type.value}>{type.displayName}</option>
               ))}
             </select>
           </div>
@@ -169,7 +169,12 @@ class CustomReport extends Component {
 
   render() {
     return (
-      <div className="container">
+      <div className="container-fluid">
+        <h2>Business Intelligence Report Exporter</h2>
+        <p>
+          Set the following parameters to construct a query and receive a .csv
+          of the results.
+        </p>
         <form onSubmit={this.getDownload}>
           <div className="form-group">
             <label>Export</label>
@@ -207,8 +212,9 @@ class CustomReport extends Component {
               onChange={this.handleChange}
             />
             {this.getDependentAdditionalOptions()}
-            <label>Filename</label>
+            <label>Desired filename</label>
             <input
+              required
               type="text"
               name="fileName"
               className="form-control"

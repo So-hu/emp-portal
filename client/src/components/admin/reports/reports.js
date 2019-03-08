@@ -73,8 +73,11 @@ class Reports extends Component {
         <div className="row">
           <CustomReport />
         </div>
+        <br />
+        <h2>Default Reports</h2>
         <div className="row">
           <SmallReport
+            title="Top recipients"
             data={this.state.data1}
             type="BarChart"
             target="topRecipients"
@@ -83,6 +86,7 @@ class Reports extends Component {
         </div>
         <div className="row">
           <SmallReport
+            title="Top award creators"
             data={this.state.data2}
             type="BarChart"
             target="topGivers"
@@ -91,6 +95,7 @@ class Reports extends Component {
         </div>
         <div className="row">
           <SmallReport
+            title="Awards per month"
             data={this.state.data3}
             type="ColumnChart"
             target="awardsByMonth"
@@ -99,6 +104,7 @@ class Reports extends Component {
         </div>
         <div className="row">
           <SmallReport
+            title="Awards per year"
             data={this.state.data4}
             type="ColumnChart"
             target="awardsByYear"

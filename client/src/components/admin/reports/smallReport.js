@@ -3,7 +3,8 @@ import Chart from "react-google-charts";
 
 class SmallReport extends Component {
   state = {
-    getData: this.props.getData
+    getData: this.props.getData,
+    title: this.props.title
   };
 
   componentDidMount() {
@@ -24,6 +25,7 @@ class SmallReport extends Component {
   render() {
     return (
       <div className="container-fluid">
+        <h3 class="text-center">{this.state.title}</h3>
         <div className="row">
           <div className="col-6">
             <Chart
