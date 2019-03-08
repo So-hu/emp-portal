@@ -12,6 +12,9 @@ const mysql = require("mysql");
 const config = require("./config.js");
 var conn = mysql.createConnection(config);
 
+//Using for sending download urls
+const baseUrl = "http://localhost:5000";
+
 conn.connect(function(err) {
   if (err) {
     console.error("error connecting: " + err.stack);
@@ -56,6 +59,73 @@ app.get("/awardsData", function(req, res) {
       }
     }
   );
+});
+
+app.post("/getQueryCsv", function(req, res) {
+  console.log(req.body);
+
+  const directory = path.join(__dirname, "../");
+
+  var fileName = req.body.fileName;
+
+  const filePrefix = fileName ? fileName : "custom-report" + Date.now();
+  const file = directory + "/server/public/reports/" + filePrefix + ".csv";
+  var url = baseUrl + "/download-report?report=" + filePrefix;
+
+  var target = req.body.target;
+  var nameType = req.body.target;
+  var name = req.body.target;
+  var awardType = req.body.target;
+  var startDate = req.body.target;
+  var endDate = req.body.target;
+  var awardComparator = req.body.target;
+
+  var sqlQuery = "";
+
+  //TODO: build sql query
+  //build sql query from request parameters
+  if (target === "awards") {
+    //build awards string
+    sqlQuery =
+      "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+    employee.lastName as recipientLast, user.firstName as creatorFirst, \
+    user.lastName as creatorLast FROM awardrecognition.awardGiven \
+    JOIN awardType on awardGiven.awardTypeID=awardType.id \
+    JOIN employee on awardGiven.recipientID=employee.id \
+    JOIN user on awardGiven.creatorID=user.id \
+    ORDER BY date DESC;";
+  } else if (target === "employees") {
+    //build employees string
+  }
+
+  //call sql query, then construct csv
+  conn.query(sqlQuery, function(err, rows, fields) {
+    if (err) {
+      console.log(err);
+      res.send("There was an error with your request");
+    } else {
+      // Format data as csv
+      var data = "";
+      fields.forEach(function(field) {
+        data = data.concat(field.name + ",");
+      });
+      data = data.slice(0, -1).concat("\n");
+      rows.forEach(function(row) {
+        Object.keys(row).forEach(function(key) {
+          data = data.concat(row[key] + ",");
+        });
+        data = data.slice(0, -1).concat("\n");
+      });
+
+      //Write file to reports folder
+      filesystem.writeFile(file, data, function(err) {
+        if (err) {
+          console.log(err);
+          res.send(err);
+        } else res.json(url);
+      });
+    }
+  });
 });
 
 app.post("/admin/addUser", function(req, res) {
@@ -220,7 +290,6 @@ app.get("/report/topRecipients", function(req, res) {
           data.chartData.push([e.Name, e.Count]);
           data.jsonData["rows"].push([e.Name, e.Count]);
         });
-        console.log(data);
         res.json(data);
       }
     }
@@ -502,9 +571,8 @@ app.get("/getDownloadUrl", function(req, res) {
 
   var report = req.query.report;
   const file = directory + "/server/public/reports/" + report + ".csv";
-  var url = "http://localhost:5000/download-report?report=" + report;
+  var url = baseUrl + "/download-report?report=" + report;
 
-  var sqlStatment = "";
   switch (report) {
     case "topRecipients":
       conn.query(
