@@ -3,29 +3,27 @@ import "./newAward.css";
 import store from "../../store/store";
 
 //TODO: add error messages from server when user not found
-const initialState = {
-  employeeFirstName: "",
-  employeeLastName: "",
-  employeeEmail: "",
-  sendDate: "",
-  sendTime: "",
-  empId: "",
-  awardClass: "",
-  firstNameError: "",
-  lastNameError: "",
-  emailError: "",
-  dateError: "",
-  timeError: "",
-  awardError: "",
-  selectedEmployee: "",
-};
 
 class CreateAwardForm extends Component {
   state = {
-    initialState,
+    userSettings: {},
+    employeeFirstName: "",
+    employeeLastName: "",
+    employeeEmail: "",
+    sendDate: "",
+    sendTime: "",
+    empId: "",
+    awardClass: "",
+    firstNameError: "",
+    lastNameError: "",
+    emailError: "",
+    dateError: "",
+    timeError: "",
+    awardError: "",
+    selectedEmployee: "",
     empOnSys: []
   };
-
+  
   componentDidMount() {
     let userAccountSettings = [];
         fetch('/user/account?email=' + store.getState().userName)
@@ -36,25 +34,19 @@ class CreateAwardForm extends Component {
                 //TODO: Need to add company name into the database
                 userAccountSettings = data.map((user) => { return {id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email }})
                 this.setState({userSettings: userAccountSettings});
-                this.setState({ 
-                    id: this.state.userSettings[0].id,
-                    firstName: this.state.userSettings[0].firstName, 
-                    lastName: this.state.userSettings[0].lastName,
-                    email: this.state.userSettings[0].email,
-                   });
                    //console.log("id sent " + this.state.id);
-                   let initialEmployees = [];
-                   fetch('/user/employeesonsystem?id=' + this.state.id)
-                       .then(response => {
-                           return response.json();
-                       })
-                       .then(data => {
-                         //console.log(JSON.stringify(data));
-                         initialEmployees = data.map((employee) => { return {id: employee.id, firstName: employee.firstName, lastName: employee.lastName}})
-                           this.setState({empOnSys: [{value: " ", display: "(select employee)"}].concat(initialEmployees)});
-                       }).catch(error => {
-                         console.log(error);
-                       });
+                let initialEmployees = [];
+                fetch('/user/employeesonsystem?id=' + this.state.userSettings[0].id)
+                  .then(response => {
+                    return response.json();
+                  })
+                  .then(data => {
+                    console.log(JSON.stringify(data));
+                    initialEmployees = data.map((employee) => { return {id: employee.id, firstName: employee.firstName, lastName: employee.lastName}})
+                    this.setState({empOnSys: [{id: "", value: " ", display: "(select employee)"}].concat(initialEmployees)});
+                  }).catch(error => {
+                    console.log(error);
+                  });
             }).catch(error => {
               console.log(error);
             });
@@ -75,13 +67,13 @@ class CreateAwardForm extends Component {
         //return res.text();
       })
       .then(data => {
-        console.log("Thisi is form the server api: " + data[0].firstName)
+        console.log("This is form the server api: " + data[0].firstName)
         this.setState({ 
           employeeFirstName: data[0].firstName, 
           employeeLastName: data[0].lastName,
           employeeEmail: data[0].email,
-          sendDate: data[0].sendDate,
-          sendTime: data[0].sendTime,
+          sendDate: "",
+          sendTime: "",
           empId: data[0].id,
          });
       })
@@ -106,7 +98,7 @@ class CreateAwardForm extends Component {
       lastNameError = "Last name is required";
     }
 
-    if (!this.state.employeeEmail.includes("@")) {
+    if (!this.state.employeeEmail || !this.state.employeeEmail.includes("@")) {
       emailError = "Invalid email";
     }
 
@@ -198,10 +190,40 @@ class CreateAwardForm extends Component {
                   return res.text();
                 })
             //clear form
-            this.setState(initialState);
+            this.setState({
+              employeeFirstName: "",
+              employeeLastName: "",
+              employeeEmail: "",
+              sendDate: "",
+              sendTime: "",
+              empId: "",
+              awardClass: "",
+              firstNameError: "",
+              lastNameError: "",
+              emailError: "",
+              dateError: "",
+              timeError: "",
+              awardError: "",
+              selectedEmployee: "",
+            })
           }
           //clear form
-          this.setState(initialState);
+          this.setState({
+            employeeFirstName: "",
+            employeeLastName: "",
+            employeeEmail: "",
+            sendDate: "",
+            sendTime: "",
+            empId: "",
+            awardClass: "",
+            firstNameError: "",
+            lastNameError: "",
+            emailError: "",
+            dateError: "",
+            timeError: "",
+            awardError: "",
+            selectedEmployee: "",
+          })
         });
       }
   };
@@ -209,18 +231,20 @@ class CreateAwardForm extends Component {
   render() {
 
     return (
-      <div class="form-style-6">
+      <div className="form-style-6">
         <h1>Create a New Award</h1>
         <form onSubmit={this.handleSubmit}>
           <div>
-            <h6>Select Employee</h6>
+            <h6>Select Previously Awarded Employee</h6>
             <select 
               name="selectedEmployee"
               value={this.state.selectedEmployee} 
               //onChange={(e) => this.setState({selectedTeam: e.target.value})}
               onChange={this.handleChange}
             >
-              {this.state.empOnSys.map((Emp) => <option key={Emp.id} value={Emp.id}>{Emp.id} {Emp.firstName} {Emp.lastName}</option>)}
+            {
+              this.state.empOnSys.map((Emp) => <option key={Emp.id} value={Emp.id}>{Emp.id} {Emp.firstName} {Emp.lastName}</option>)
+            }
             </select>
           </div>
 
@@ -245,7 +269,7 @@ class CreateAwardForm extends Component {
           <input
             type="email"
             name="employeeEmail"
-            placeHolder="Email"
+            placeholder="Email"
             value={this.state.employeeEmail}
             onChange={this.handleChange}
           />
@@ -255,7 +279,7 @@ class CreateAwardForm extends Component {
             value={this.state.awardClass}
             onChange={this.handleChange}
           >
-            <option value="" disabled selected>Select Award Type</option>
+            <option value="" defaultValue>Select Award Type</option>
             <option value="1">Employee of the Month</option>
             <option value="2">Employee of the Week</option>
             <option value="3">Highest Sales in a Month</option>

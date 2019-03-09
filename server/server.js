@@ -749,7 +749,7 @@ else{
 
 app.get("/user/employeesonsystem", function(req, res) {
   conn.query(
-  "SELECT employee.id, employee.firstName as firstName, employee.lastName as lastName\
+  "SELECT DISTINCT employee.id, employee.firstName as firstName, employee.lastName as lastName\
   FROM awardrecognition.awardGiven \
       JOIN awardType on awardGiven.awardTypeID=awardType.id \
       JOIN employee on awardGiven.recipientID=employee.id \
