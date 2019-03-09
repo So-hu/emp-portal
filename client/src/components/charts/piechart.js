@@ -1,14 +1,45 @@
 import React, { Component } from 'react';
 import { Chart } from "react-google-charts";
+import store from "../../store/store";
  
 class Piechart extends Component{
 
 	state = { awards: [] }
 
 	componentDidMount() {
-		fetch('/user/awardsgiven')
-		.then(res => res.json())
-		.then(awards => this.setState({ awards }));
+		//console.log(store.getState().userData.userClass);
+
+        if (store.getState().userData.userClass === "administrator"){
+					fetch('/user/awardsgiven?id=' + "")
+					.then(res => res.json())
+					.then(awards => this.setState({ awards }));
+        }
+        else{
+        let userAccountSettings = [];
+        fetch('/user/account?email=' + store.getState().userName)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                //TODO: Need to add company name into the database
+                userAccountSettings = data.map((user) => { return {id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email }})
+                this.setState({userSettings: userAccountSettings});
+                this.setState({ 
+                    id: this.state.userSettings[0].id,
+                    firstName: this.state.userSettings[0].firstName, 
+                    lastName: this.state.userSettings[0].lastName,
+                    email: this.state.userSettings[0].email,
+                   });
+                   //console.log("id sent " + this.state.id);
+                   fetch('/user/awardsgiven?id=' + this.state.id)
+                   .then(res => res.json())
+                   .then(awards => this.setState({ awards }));
+            }).catch(error => {
+              console.log(error);
+            });
+            
+
+        }
 	}
 
   render(){
