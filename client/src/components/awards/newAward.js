@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import "./newAward.css";
+import store from "../../store/store";
 
 //TODO: add error messages from server when user not found
 const initialState = {
@@ -26,17 +27,37 @@ class CreateAwardForm extends Component {
   };
 
   componentDidMount() {
-    let initialEmployees = [];
-    fetch('/user/employeesonsystem')
-        .then(response => {
-            return response.json();
-        })
-        .then(data => {
-          initialEmployees = data.map((employee) => { return {id: employee.id, firstName: employee.firstName, lastName: employee.lastName}})
-            this.setState({empOnSys: [{value: " ", display: "(select employee)"}].concat(initialEmployees)});
-        }).catch(error => {
-          console.log(error);
-        });
+    let userAccountSettings = [];
+        fetch('/user/account?email=' + store.getState().userName)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                //TODO: Need to add company name into the database
+                userAccountSettings = data.map((user) => { return {id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email }})
+                this.setState({userSettings: userAccountSettings});
+                this.setState({ 
+                    id: this.state.userSettings[0].id,
+                    firstName: this.state.userSettings[0].firstName, 
+                    lastName: this.state.userSettings[0].lastName,
+                    email: this.state.userSettings[0].email,
+                   });
+                   //console.log("id sent " + this.state.id);
+                   let initialEmployees = [];
+                   fetch('/user/employeesonsystem?id=' + this.state.id)
+                       .then(response => {
+                           return response.json();
+                       })
+                       .then(data => {
+                         //console.log(JSON.stringify(data));
+                         initialEmployees = data.map((employee) => { return {id: employee.id, firstName: employee.firstName, lastName: employee.lastName}})
+                           this.setState({empOnSys: [{value: " ", display: "(select employee)"}].concat(initialEmployees)});
+                       }).catch(error => {
+                         console.log(error);
+                       });
+            }).catch(error => {
+              console.log(error);
+            });
   }
 
   handleChange = event => {

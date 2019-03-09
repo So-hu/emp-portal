@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import "./awards/newAward.css";
+import store from "../store/store";
 
 const initialState = {
+    id: "",
     firstName: "",
     lastName: "",
     email: "", 
@@ -22,22 +24,21 @@ class UserAccount extends Component {
       };
 
     componentDidMount() {
+        //console.log(store.getState().userName);
         let userAccountSettings = [];
-        //TODO: Need to somehow determine who is logged in to get data. Currently is set to get Jared Goff profile.
-        fetch('/user/account?id=' + 2)
+        fetch('/user/account?email=' + store.getState().userName)
             .then(response => {
                 return response.json();
             })
             .then(data => {
                 //TODO: Need to add company name into the database
-                userAccountSettings = data.map((user) => { return {id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, password: user.password}})
+                userAccountSettings = data.map((user) => { return {id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email }})
                 this.setState({userSettings: userAccountSettings});
-                console.log("This is the client account page: " + this.state.userSettings[0].password);
                 this.setState({ 
+                    id: this.state.userSettings[0].id,
                     firstName: this.state.userSettings[0].firstName, 
                     lastName: this.state.userSettings[0].lastName,
                     email: this.state.userSettings[0].email,
-                    password: this.state.userSettings[0].password,
                    });
             }).catch(error => {
               console.log(error);
@@ -67,14 +68,14 @@ class UserAccount extends Component {
         if (!this.state.email.includes('@')){
             emailError = "invalid email!";
         }
+        //not sure if title was needed in the award
+        //if (!this.state.companyName){
+            //companyNameError = "company name should not be empty!";
+        //}
 
-        if (!this.state.companyName){
-            companyNameError = "company name should not be empty!";
-        }
-
-        if (!this.state.password){
-            passwordError = "password should not be empty!";
-        }
+        //if (!this.state.password){
+            //passwordError = "password should not be empty!";
+        //}
 
         if(emailError || firstNameError || lastNameError || companyNameError || passwordError){
             this.setState({emailError, firstNameError, lastNameError, companyNameError, passwordError});
@@ -88,7 +89,6 @@ class UserAccount extends Component {
         event.preventDefault();
         const isValid = this.validate();
         if (isValid){
-            //TODO: Need to somehow see how i can get what user is logged in. Currently is just updateing Jared Goff accoungt.
             //valid input
             fetch("/user/account", {
                 method: "POST",
@@ -97,7 +97,7 @@ class UserAccount extends Component {
                 },
 
                 body: JSON.stringify({
-                id: 2,
+                id: this.state.id,
                 firstName: this.state.firstName,
                 lastName: this.state.lastName,
                 email: this.state.email,
@@ -141,15 +141,7 @@ class UserAccount extends Component {
                         </div>
                         <input type="email" name="email" placeHolder="email" value={this.state.email} 
                             onChange={this.handleChange} 
-                        />
-                    </div>
-                    <div>
-                        <div style={{color: "red", fontSize: 12}}>
-                            {this.state.companyNameError}
-                        </div>
-                        <input type="text" name="companyName" placeHolder="Company Name" value={this.state.companyName} 
-                            onChange={this.handleChange} 
-                        />
+                            readonly="readonly"/>
                     </div>
                     <div>
                         <div style={{color: "red", fontSize: 12}}>

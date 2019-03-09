@@ -51,7 +51,9 @@ app.get("/awardsData", function(req, res) {
     JOIN awardType on awardGiven.awardTypeID=awardType.id \
     JOIN employee on awardGiven.recipientID=employee.id \
     JOIN user on awardGiven.creatorID=user.id \
+    WHERE creatorID = 10\
     ORDER BY date DESC;",
+    [req.body.id],
     function(err, result) {
       if (err) {
         console.log(err);
@@ -327,7 +329,7 @@ app.post("/user/addAward", function(req, res) {
         //Use id from above query to find the recipient
         recipientID = result[0].id;
         //TODO: get creatorID from currently logged in user
-        creatorID = 1;
+        creatorID = 10;
         conn.query(
           "INSERT INTO awardGiven (awardTypeID, recipientID, creatorID, date, time) VALUES(?,?,?,?,?)",
           [
@@ -521,13 +523,33 @@ app.get("/report/awardsByYear", function(req, res) {
 });
 
 app.get("/user/awardsgiven", function(req, res) {
-  //res.json({"total":100});
   var eom = 0; //employee of the month counter
   var eow = 0; //employee of the week counter
   var hsm = 0; //highest sale of the month
   var unknown = 0;
-
-  conn.query("SELECT awardTypeID FROM awardGiven", function(err, data) {
+  if(req.query.id === ""){
+    conn.query("SELECT awardTypeID FROM awardGiven", function(err, data) {
+      if (err) {
+        console.log(err);
+        res.send("Error getting awardGiven");
+      } else {
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].awardTypeID === 1) {
+            eom++;
+          } else if (data[i].awardTypeID === 2) {
+            eow++;
+          } else if (data[i].awardTypeID === 3) {
+            hsm++;
+          } else {
+            unknown++;
+          }
+        }
+        res.send({ eom, eow, hsm, unknown });
+      }
+    });
+  }
+  else{
+  conn.query("SELECT awardTypeID FROM awardGiven WHERE creatorID=?", [req.query.id], function(err, data) {
     if (err) {
       console.log(err);
       res.send("Error getting awardGiven");
@@ -546,9 +568,44 @@ app.get("/user/awardsgiven", function(req, res) {
       res.send({ eom, eow, hsm, unknown });
     }
   });
+}
 });
 
 app.get("/user/top5employess", function(req, res) {
+  if(req.query.id != ""){
+    conn.query(
+      "SELECT Count(*) AS Count, CONCAT_WS(' ', firstName, lastName) AS Name \
+      FROM awardGiven\
+      INNER JOIN employee ON awardGiven.recipientID=employee.id\
+      WHERE creatorID = ?\
+      GROUP BY employee.id \
+      ORDER BY Count DESC\
+      LIMIT 5",
+        [req.query.id],
+      function(err, data) {
+        if (err) {
+          console.log(err);
+          res.send("Error getting awardGiven");
+        } else {
+          data = {
+            employee1: data[0].Name,
+            emp1Awards: data[0].Count,
+            employee2: data[1].Name,
+            emp2Awards: data[1].Count,
+            employee3: data[2].Name,
+            emp3Awards: data[2].Count,
+            employee4: data[3].Name,
+            emp4Awards: data[3].Count,
+            employee5: data[4].Name,
+            emp5Awards: data[4].Count
+          };
+          res.send(data);
+        }
+      }
+    );
+
+  }
+else{
   conn.query(
     "SELECT Count(*) AS Count, \
       CONCAT_WS(' ', firstName, lastName) AS Name\
@@ -562,6 +619,7 @@ app.get("/user/top5employess", function(req, res) {
         console.log(err);
         res.send("Error getting awardGiven");
       } else {
+        //console.log(JSON.stringify(data))
         data = {
           employee1: data[0].Name,
           emp1Awards: data[0].Count,
@@ -578,10 +636,32 @@ app.get("/user/top5employess", function(req, res) {
       }
     }
   );
+  }
 });
 
 //Get awards history
 app.get("/user/awardsData", function(req, res) {
+  if(req.query.id != ""){
+    conn.query(
+      "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+      employee.lastName as recipientLast \
+      FROM awardrecognition.awardGiven \
+      JOIN awardType on awardGiven.awardTypeID=awardType.id \
+      JOIN employee on awardGiven.recipientID=employee.id \
+      WHERE creatorID = ?\
+      ORDER BY date DESC \
+      LIMIT 5;",
+      [req.query.id],
+      function(err, result) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.json(result);
+        }
+      }
+    );
+  }
+  else{
   conn.query(
     "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
     employee.lastName as recipientLast \
@@ -598,6 +678,7 @@ app.get("/user/awardsData", function(req, res) {
       }
     }
   );
+  }
 });
 
 //Get awards history
@@ -605,6 +686,40 @@ app.get("/user/summary", function(req, res) {
   var data;
   var numEmps;
   var awardsGiven;
+  if(req.query.id != ""){
+  conn.query("SELECT Count(*) AS Count, CONCAT_WS(' ', firstName, lastName) AS Name\
+  FROM awardGiven\
+  INNER JOIN employee ON awardGiven.recipientID=employee.id\
+  WHERE creatorID = ?\
+  GROUP BY employee.id \
+  ORDER BY Count DESC", 
+  [req.query.id],
+  function(err, result) {
+    if (err) {
+      console.log(err);
+    } else {
+      numEmps = Object.keys(result).length;
+
+      conn.query("SELECT Count(*) AS Count2 FROM awardGiven WHERE creatorID = ?", [req.query.id], function(
+        err,
+        result2
+      ) {
+        if (err) {
+          console.log(err);
+        } else {
+          awardsGiven = result2[0].Count2;
+
+          data = {
+            numEmployees: numEmps,
+            numberAwards: awardsGiven
+          };
+          res.json(data);
+        }
+      });
+    }
+  });
+}
+else{
   conn.query("SELECT Count(*) AS Count FROM employee", function(err, result) {
     if (err) {
       console.log(err);
@@ -629,11 +744,18 @@ app.get("/user/summary", function(req, res) {
       });
     }
   });
+}
 });
 
 app.get("/user/employeesonsystem", function(req, res) {
   conn.query(
-  "SELECT id, firstName, lastName, email FROM employee",
+  "SELECT employee.id, employee.firstName as firstName, employee.lastName as lastName\
+  FROM awardrecognition.awardGiven \
+      JOIN awardType on awardGiven.awardTypeID=awardType.id \
+      JOIN employee on awardGiven.recipientID=employee.id \
+      JOIN user on awardGiven.creatorID=user.id \
+      WHERE creatorID = ?;",
+  [req.query.id],
     function(err, rows) {
       if (err) {
         console.log(err);
@@ -664,8 +786,8 @@ app.get("/user/getemployee", function(req, res) {
 
 app.get("/user/account", function(req, res) {
   conn.query(
-  "SELECT id, firstName, lastName, email, password FROM user WHERE id=?",
-  [req.query.id],
+  "SELECT id, firstName, lastName, email FROM user WHERE email=?",
+  [req.query.email],
     function(err, rows) {
       if (err) {
         console.log(err);
@@ -683,9 +805,8 @@ app.post("/user/account", function(req, res) {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
-    password: ""
   };
-  if (req.body.password != " ") {
+  if (req.body.password != "") {
     bcrypt.genSalt(10, function(err, salt) {
     bcrypt.hash(req.body.password, salt, function(err, hash) {
     changes.password = hash;
