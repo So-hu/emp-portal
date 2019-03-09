@@ -3,7 +3,8 @@ import Chart from "react-google-charts";
 
 class SmallReport extends Component {
   state = {
-    getData: this.props.getData
+    getData: this.props.getData,
+    title: this.props.title
   };
 
   componentDidMount() {
@@ -24,6 +25,7 @@ class SmallReport extends Component {
   render() {
     return (
       <div className="container-fluid">
+        <h3 class="text-center">{this.state.title}</h3>
         <div className="row">
           <div className="col-6">
             <Chart
@@ -42,13 +44,15 @@ class SmallReport extends Component {
             />
           </div>
           <div className="col-6">
-            <table class="table table-striped">
+            <table className="table table-striped">
               <thead>
-                {this.props.data.jsonData
-                  ? this.props.data.jsonData.header.map(header => (
-                      <th>{header}</th>
-                    ))
-                  : "Loading"}
+                <tr>
+                  {this.props.data.jsonData
+                    ? this.props.data.jsonData.header.map(header => (
+                        <th>{header}</th>
+                      ))
+                    : null}
+                </tr>
               </thead>
               <tbody>
                 {this.props.data.jsonData
@@ -59,7 +63,7 @@ class SmallReport extends Component {
                         ))}
                       </tr>
                     ))
-                  : "Loading Data Table..."}
+                  : null}
               </tbody>
             </table>
             <button onClick={this.getDownload} className="btn btn-secondary">
