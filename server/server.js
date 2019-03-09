@@ -756,9 +756,9 @@ app.post("/userAuth", function(req, res) {
   /*if(user == "admin"){
     res.json({valid: true, role: "administrator", msg:""})
   }*/
-  var result = { valid: false, role: "", msg: "" };
+  var result = { valid: false, user: {}, msg: "" };
   conn.query(
-    "SELECT password, userClass from user WHERE email= ?",
+    "SELECT password, userClass, firstName, lastName from user WHERE email= ?",
     [user],
     function(err, data) {
       if (data.length == 0) {
@@ -768,7 +768,7 @@ app.post("/userAuth", function(req, res) {
         bcrypt.compare(password, data[0].password, function(err, isMatch) {
           if (isMatch) {
             result.valid = true;
-            result.role = data[0].userClass;
+            result.user = {userClass: data[0].userClass, firstName: data[0].firstName, lastName: data[0].lastName};
           } else {
             result.msg = "Username and password do not match";
           }

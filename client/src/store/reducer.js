@@ -17,8 +17,7 @@ const loadState = () =>{
 
 var initialState = {
     authenticated: false,
-    userName: '',
-    userClass: '', //userclass here
+    userData: {userName: '', firstName: '', lastName: '', userClass: ''},
     routes: []
 }
 
@@ -34,8 +33,8 @@ const logState = (state=initialState, action) => {
         case LOG_IN:
             newState.authenticated = true
             newState.userName = action.userName
-            newState.userClass = action.userClass
-            if (newState.userClass === "nonadministrator") {
+            newState.userData = action.userData
+            if (newState.userData.userClass === "nonadministrator") {
                 newState.routes=
                   [
                     { route: "/homepage", name: "Home" },
@@ -43,7 +42,7 @@ const logState = (state=initialState, action) => {
                     { route: "/awardshistory", name: "Awards History" },
                     { route: "/account", name: "Account" }
                   ]      
-              } else if (newState.userClass === "administrator") {
+              } else if (newState.userData.userClass === "administrator") {
                 newState.routes=
                   [
                     { route: "/homepage", name: "Home" },
@@ -57,8 +56,7 @@ const logState = (state=initialState, action) => {
             break
         case LOG_OUT:
             newState.authenticated = false
-            newState.userClass = ''
-            newState.userName = ''
+            newState.userData = {}
             newState.routes = []
             sessionStorage.clear()
             break
