@@ -72,11 +72,11 @@ class Login extends Component {
         //can't use 'this' here due to context loss in promise
         self.setState({
           redirect: data.valid,
-          userClass: data.role,
+          userClass: data.user.userClass,
           errors: { login: data.msg }
         });
         if (data.valid === true) {
-          store.dispatch(logIn(user, data.role));
+          store.dispatch(logIn(user, data.user));
         }
       });
   };
