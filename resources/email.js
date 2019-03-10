@@ -60,12 +60,12 @@ function createTransporter(emailInformation, awardID) {
         service: 'gmail',
         host: 'stmp.gmail.com',
         auth: {
-            user: 'donotreplyzibalgroup@gmail.com',
-            pass: 'zibalgroup19'
+            user: '',
+            pass: ''
         }
     });
 
-    var company = 'donotreplyzibalgroup@gmail.com';
+    var company = '';
 
     var message = {
         from: company,
