@@ -1,5 +1,6 @@
 //use this page to build employee table from db
 import React, { Component } from "react";
+import store from "../../store/store";
 
 //ajax via react using states
 class awardsHistory extends Component {
@@ -14,17 +15,37 @@ class awardsHistory extends Component {
 
   componentDidMount() {
     this.setState({ mounted: true });
-    fetch("/awardsData") //uses the proxy to send request to server for data
-      .then(res => res.json())
-      .then(
-        awards =>
-          this.setState({ isLoaded: true, awards }, () =>
-            console.log("Awards fetched..", awards)
-          ),
-        error => {
-          this.setState({ isLoaded: true, error });
-        }
-      );
+
+    let userAccountSettings = [];
+    fetch('/user/account?email=' + store.getState().userName)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            //TODO: Need to add company name into the database
+            userAccountSettings = data.map((user) => { return {id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email }})
+            this.setState({userSettings: userAccountSettings});
+            this.setState({ 
+                id: this.state.userSettings[0].id,
+                firstName: this.state.userSettings[0].firstName, 
+                lastName: this.state.userSettings[0].lastName,
+                email: this.state.userSettings[0].email,
+               });
+               //console.log("id sent " + this.state.id);
+               fetch("/awardsData?id=" + this.state.id) //uses the proxy to send request to server for data
+               .then(res => res.json())
+               .then(
+                 awards =>
+                   this.setState({ isLoaded: true, awards }, () =>
+                     console.log("Awards fetched..", awards)
+                   ),
+                 error => {
+                   this.setState({ isLoaded: true, error });
+                 }
+               );
+        }).catch(error => {
+          console.log(error);
+        });
   }
 
   render() {

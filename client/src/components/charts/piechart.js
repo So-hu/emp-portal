@@ -33,7 +33,18 @@ class Piechart extends Component{
                    //console.log("id sent " + this.state.id);
                    fetch('/user/awardsgiven?id=' + this.state.id)
                    .then(res => res.json())
-                   .then(awards => this.setState({ awards }));
+                   .then((awards) => {
+                     if(awards.eom === 0 || awards.eow === 0 || awards.hsm === 0 )
+                     {
+                       awards = {"eom":0,"eow":0,"hsm":0,"unknown":1};
+                       this.setState({ awards });
+                     }
+                    //let numEmp = Object.keys(awards).length;
+                    //numEmp = numEmp/2;
+                    else{
+                     this.setState({ awards })
+                    }
+                    });
             }).catch(error => {
               console.log(error);
             });
@@ -55,7 +66,8 @@ class Piechart extends Component{
 		    ['Awards Given', 'Number of Awards'],
 		    ['Employee of the Month', this.state.awards.eom],
 				['Employee of the Week', this.state.awards.eow],
-				['Highest Sales in a Month', this.state.awards.hsm]
+        ['Highest Sales in a Month', this.state.awards.hsm],
+        ['N/A', this.state.awards.unknown]
 		  ]}
 		  options={{
 		    title: 'Awards Given',
