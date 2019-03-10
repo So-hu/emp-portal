@@ -352,7 +352,11 @@ app.post("/user/addAward", function(req, res) {
               console.log("Award successfully granted.");
               var certificate = require(directory + '/resources/certificate.js')
               certificate(awardID);
+<<<<<<< HEAD
               
+=======
+
+>>>>>>> 0b59089516a07a68e9c969d7f861be874de24064
               res.send(msg);
             }
           }
