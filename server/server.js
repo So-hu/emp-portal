@@ -549,6 +549,41 @@ app.get("/user/awardsgiven", function(req, res) {
 });
 
 app.get("/user/top5employess", function(req, res) {
+  if(req.query.id != ""){
+    conn.query(
+      "SELECT Count(*) AS Count, CONCAT_WS(' ', firstName, lastName) AS Name \
+      FROM awardGiven\
+      INNER JOIN employee ON awardGiven.recipientID=employee.id\
+      WHERE creatorID = ?\
+      GROUP BY employee.id \
+      ORDER BY Count DESC\
+      LIMIT 5",
+        [req.query.id],
+      function(err, data) {
+        if (err) {
+          console.log(err);
+          res.send("Error getting awardGiven");
+        } else {
+          console.log(data)
+          data = {
+            employee1: data[0].Name,
+            emp1Awards: data[0].Count,
+            employee2: data[1].Name,
+            emp2Awards: data[1].Count,
+            employee3: data[2].Name,
+            emp3Awards: data[2].Count,
+            employee4: data[3].Name,
+            emp4Awards: data[3].Count,
+            employee5: data[4].Name,
+            emp5Awards: data[4].Count
+          };
+          res.send(data);
+        }
+      }
+    );
+
+  }
+else{
   conn.query(
     "SELECT Count(*) AS Count, \
       CONCAT_WS(' ', firstName, lastName) AS Name\

@@ -18,6 +18,8 @@ const loadState = () =>{
 var initialState = {
     authenticated: false,
     userData: {userName: '', firstName: '', lastName: '', userClass: ''},
+    userName: "",
+    userClass: "",
     routes: []
 }
 
@@ -33,6 +35,7 @@ const logState = (state=initialState, action) => {
         case LOG_IN:
             newState.authenticated = true
             newState.userName = action.userName
+            newState.userClass = action.userData.userClass
             newState.userData = action.userData
             if (newState.userData.userClass === "nonadministrator") {
                 newState.routes=
@@ -56,6 +59,8 @@ const logState = (state=initialState, action) => {
             break
         case LOG_OUT:
             newState.authenticated = false
+            newState.userName = ""
+            newState.userClass = ""
             newState.userData = {}
             newState.routes = []
             sessionStorage.clear()
