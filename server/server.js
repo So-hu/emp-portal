@@ -613,7 +613,7 @@ else{
       }
     }
   );
-});
+};
 
 //Get awards history
 app.get("/user/awardsData", function(req, res) {
