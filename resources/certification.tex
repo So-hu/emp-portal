@@ -9,14 +9,8 @@ lmargin=.5cm,rmargin=.5cm}
 \usepackage{xcolor}
 \usepackage{multicol}
 \usepackage{ulem}
-\usepackage{datatool}
 
 \begin{document}
-
-\DTLloaddb{awardInformation}{data.csv}
-\DTLforeach{awardInformation} {
-\recipientFirstName=recipientFirstName, \recipientLastName=recipientLastName, \senderFirstName=senderFirstName, \senderLastName=senderLastName, \awardDate=awardDate,
-\awardName=awardType}
 
 \centering
 \scalebox{3}{\color{blue}
@@ -31,26 +25,28 @@ lmargin=.5cm,rmargin=.5cm}
 {Zibal Company}\\
 
 \textcolor{black}{
-As a thank you for your outstanding performance and dedication, we hereby recognize you as}
+As a thank you for your outstanding performance and dedication, we hereby recognize}
 
 \smallskip
 
-{\large \textsc{\awardName}}
+{\large \textsc{awardName}}
 
 \vspace{2mm}
 
 
-\tiny to: \uline{\textcolor{black}{\sc {\recipientFirstName} {\recipientLastName}}}
+\tiny to: \uline{\textcolor{black}{\sc {recipientFirstName} {recipientLastName}}}
 
 
 \vspace{5mm}
 
 {\color{red}
-\scalebox{0.9}{
+\scalebox{0.7}{
 \begin{tabular}{ccc}
-\\ {\senderSignature} && {\awardDate}
-\\ {\sc$\overline{{\senderFirstName} {\senderLastName}}$} &&
-$\overline{Date Awarded}$ \\
+% \\ \includegraphics[width=1in, height=.5in]{\senderSignature} && {awardDate}
+\\ {senderSignature} && {awardDate}
+\\ \hrulefill && \hrulefill
+\\ \sc{{senderFirstName} {senderLastName}} &&
+Date Awarded \\
 \end{tabular}
 }}}}
 \end{minipage}
