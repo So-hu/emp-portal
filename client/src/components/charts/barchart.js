@@ -51,7 +51,29 @@ class Barchart extends Component{
                    //console.log("id sent " + this.state.id);
                    fetch('/user/top5employess?id=' + this.state.id)
                    .then(res => res.json())
-                   .then(awards => this.setState({ awards }));
+                   .then((awards) => {
+                       let numEmp = Object.keys(awards).length;
+                       numEmp = numEmp/2;
+                       if (numEmp < 5){
+                           console.log("not enough awards!")
+                            awards = {
+                                employee1: "N/A",
+                                emp1Awards: 0,
+                                employee2: "N/A",
+                                emp2Awards: 0,
+                                employee3: "N/A",
+                                emp3Awards: 0,
+                                employee4: "N/A",
+                                emp4Awards: 0,
+                                employee5: "N/A",
+                                emp5Awards: 0
+                            }
+                            this.setState({ awards });
+                       }
+                       else{
+                        this.setState({ awards });
+                       }
+                    });
             }).catch(error => {
               console.log(error);
             });

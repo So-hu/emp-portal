@@ -47,22 +47,45 @@ app.get("/employeeData", function(req, res) {
 
 //Get awards history
 app.get("/awardsData", function(req, res) {
-  conn.query(
-    "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
-    employee.lastName as recipientLast, user.firstName as creatorFirst, \
-    user.lastName as creatorLast FROM awardrecognition.awardGiven \
-    JOIN awardType on awardGiven.awardTypeID=awardType.id \
-    JOIN employee on awardGiven.recipientID=employee.id \
-    JOIN user on awardGiven.creatorID=user.id \
-    ORDER BY date DESC;",
-    function(err, result) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(result);
+  if(req.query.id != ""){
+    conn.query(
+      "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+      employee.lastName as recipientLast, user.firstName as creatorFirst, \
+      user.lastName as creatorLast FROM awardrecognition.awardGiven \
+      JOIN awardType on awardGiven.awardTypeID=awardType.id \
+      JOIN employee on awardGiven.recipientID=employee.id \
+      JOIN user on awardGiven.creatorID=user.id \
+      WHERE creatorID = ?\
+      ORDER BY date DESC;",
+      [req.query.id],
+      function(err, result) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.json(result);
+        }
       }
-    }
-  );
+    );
+  }
+
+  else{
+    conn.query(
+      "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+      employee.lastName as recipientLast, user.firstName as creatorFirst, \
+      user.lastName as creatorLast FROM awardrecognition.awardGiven \
+      JOIN awardType on awardGiven.awardTypeID=awardType.id \
+      JOIN employee on awardGiven.recipientID=employee.id \
+      JOIN user on awardGiven.creatorID=user.id \
+      ORDER BY date DESC;",
+      function(err, result) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.json(result);
+        }
+      }
+    );
+  }
 });
 
 app.post("/getQueryCsv", function(req, res) {
@@ -352,11 +375,6 @@ app.post("/user/addAward", function(req, res) {
               console.log("Award successfully granted.");
               var certificate = require(directory + '/resources/certificate.js')
               certificate(awardID);
-<<<<<<< HEAD
-              
-=======
-
->>>>>>> 0b59089516a07a68e9c969d7f861be874de24064
               res.send(msg);
             }
           }
@@ -561,6 +579,58 @@ app.get("/user/awardsgiven", function(req, res) {
 });
 
 app.get("/user/top5employess", function(req, res) {
+  if(req.query.id != ""){
+    conn.query(
+      "SELECT Count(*) AS Count, CONCAT_WS(' ', firstName, lastName) AS Name \
+      FROM awardGiven\
+      INNER JOIN employee ON awardGiven.recipientID=employee.id\
+      WHERE creatorID = ?\
+      GROUP BY employee.id \
+      ORDER BY Count DESC\
+      LIMIT 5",
+        [req.query.id],
+      function(err, data) {
+        if (err) {
+          console.log(err);
+          res.send("Error getting awardGiven");
+        } else {
+          if(Object.keys(data).length === 0)
+          {
+            data = {
+              employee1: "N/A",
+              emp1Awards: 0,
+              employee2:  "N/A",
+              emp2Awards: 0,
+              employee3:  "N/A",
+              emp3Awards: 0,
+              employee4:  "N/A",
+              emp4Awards: 0,
+              employee5:  "N/A",
+              emp5Awards: 0
+            };
+            res.send(data);
+          }
+          else{
+            data = {
+              employee1: data[0].Name,
+              emp1Awards: data[0].Count,
+              employee2: data[1].Name,
+              emp2Awards: data[1].Count,
+              employee3: data[2].Name,
+              emp3Awards: data[2].Count,
+              employee4: data[3].Name,
+              emp4Awards: data[3].Count,
+              employee5: data[4].Name,
+              emp5Awards: data[4].Count
+            };
+            res.send(data);
+        }
+        }
+      }
+    );
+
+  }
+else{
   conn.query(
     "SELECT Count(*) AS Count, \
       CONCAT_WS(' ', firstName, lastName) AS Name\
