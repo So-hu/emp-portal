@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Users from "./users";
 import Modal from "react-modal";
 import EditUserForm from "./editUserForm";
+import ImageUploader from "react-images-upload";
 
 const modalStyles = {
   content: {
@@ -24,6 +25,7 @@ class AdminConsole extends Component {
       firstName: "",
       lastName: "",
       userClass: "",
+      signature: [],
       msg: "",
       users: [],
       usersIsLoaded: false,
@@ -35,6 +37,7 @@ class AdminConsole extends Component {
       editFirstName: "",
       editLastName: "",
       editUserClass: "",
+      editSignature: [],
       editModalOpen: false,
       editMsg: ""
     };
@@ -128,7 +131,8 @@ class AdminConsole extends Component {
       editPassword,
       editFirstName,
       editLastName,
-      editUserClass
+      editUserClass,
+      editSignature
     } = this.state;
     //Todo: validate edit input
     this.setState({ msg: "" });
@@ -144,7 +148,8 @@ class AdminConsole extends Component {
         password: editPassword,
         firstName: editFirstName,
         lastName: editLastName,
-        userClass: editUserClass
+        userClass: editUserClass,
+        signature: editSignature
       })
     })
       .then(res => {
@@ -158,6 +163,18 @@ class AdminConsole extends Component {
       });
   };
 
+  uploadNewUserPicture = picture => {
+    this.setState({
+      signature: picture
+    });
+  };
+
+  uploadEditUserPicture = picture => {
+    this.setState({
+      editSignature: picture
+    });
+  };
+
   //when any field in the form is changed, update the state to reflect the new values
   handleChange = event => {
     this.setState({
@@ -167,11 +184,22 @@ class AdminConsole extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    const { email, password, firstName, lastName, userClass } = this.state;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      userClass,
+      signature
+    } = this.state;
     var { errors, isValid } = this.isValidInput(email, password, userClass);
     if (!isValid) {
       //if the input is invalid, set the errors state with the error object returned from isValidInput
       this.setState({ errors });
+      return;
+    }
+    if (userClass === "nonadministrator" && signature.length != 1) {
+      this.setState({ msg: "Please upload one signature image." });
       return;
     }
     //valid input
@@ -187,7 +215,8 @@ class AdminConsole extends Component {
         password: password,
         firstName: firstName,
         lastName: lastName,
-        userClass: userClass
+        userClass: userClass,
+        signature: signature
       })
     })
       .then(res => {
@@ -198,6 +227,23 @@ class AdminConsole extends Component {
         self.setState({ msg: data });
         self.updateUsersTable();
       });
+  };
+
+  getImageUploader = (onChangeFunction, userClass) => {
+    if (userClass === "nonadministrator") {
+      return (
+        <div className="form-row">
+          <ImageUploader
+            withIcon={true}
+            buttonText="Upload signature image"
+            onChange={onChangeFunction}
+            imgExtension={[".jpg", ".gif", ".png", ".gif"]}
+            maxFileSize={5242880}
+            withPreview={true}
+          />
+        </div>
+      );
+    }
   };
 
   render() {
@@ -215,9 +261,12 @@ class AdminConsole extends Component {
             firstName={this.state.editFirstName}
             lastName={this.state.editLastName}
             userClass={this.state.editUserClass}
+            signature={this.state.editSignature}
             msg={this.state.msg}
             handleEdit={this.handleUserSubmitEdit}
             handleChange={this.handleChange}
+            handlePictureUpload={this.uploadEditUserPicture}
+            getUploader={this.getImageUploader}
           />
         </Modal>
         <Users
@@ -229,74 +278,81 @@ class AdminConsole extends Component {
           onUserDelete={this.handleUserDelete}
         />
         <br />
-        <div>
+        <div className="container">
           <form onSubmit={this.handleSubmit}>
-            <div className="form-group col-md-6">
-              <div className="form-row">
-                <div className="form-group col-md-6">
-                  <label>Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    className="form-control"
-                    id="inputEmail4"
-                    placeholder="Email"
-                    value={this.state.email}
-                    onChange={this.handleChange}
-                  />
-                </div>
-                <div className="form-group col-md-6">
-                  <label>Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    className="form-control"
-                    id="inputPassword4"
-                    placeholder="Password"
-                    value={this.state.password}
-                    onChange={this.handleChange}
-                  />
-                </div>
+            <div className="form-row">
+              <div className="form-group col-md-6">
+                <label>Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  className="form-control"
+                  id="inputEmail4"
+                  placeholder="Email"
+                  value={this.state.email}
+                  onChange={this.handleChange}
+                />
+              </div>
+              <div className="form-group col-md-6">
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  className="form-control"
+                  id="inputPassword4"
+                  placeholder="Password"
+                  value={this.state.password}
+                  onChange={this.handleChange}
+                />
               </div>
             </div>
-            <div className="form-group col-md-6">
-              <label>First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                className="form-control"
-                id="inputFname"
-                placeholder="First Name"
-                value={this.state.firstName}
-                onChange={this.handleChange}
-              />
+            <div className="form-row">
+              <div className="form-group col-md-6">
+                <label>First Name</label>
+                <input
+                  type="text"
+                  name="firstName"
+                  className="form-control"
+                  id="inputFname"
+                  placeholder="First Name"
+                  value={this.state.firstName}
+                  onChange={this.handleChange}
+                />
+              </div>
+              <div className="form-group col-md-6">
+                <label>Last name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  className="form-control"
+                  id="inputLname"
+                  placeholder="Last Name"
+                  value={this.state.lastName}
+                  onChange={this.handleChange}
+                />
+              </div>
             </div>
-            <div className="form-group col-md-6">
-              <label>Last name</label>
-              <input
-                type="text"
-                name="lastName"
-                className="form-control"
-                id="inputLname"
-                placeholder="Last Name"
-                value={this.state.lastName}
-                onChange={this.handleChange}
-              />
+            <div className="form-row">
+              <div className="form-group col-md-6">
+                <label>Permissions</label>
+                <select
+                  id="inputClass"
+                  name="userClass"
+                  className="form-control"
+                  value={this.state.userClass}
+                  onChange={this.handleChange}
+                >
+                  <option>Choose...</option>
+                  <option>administrator</option>
+                  <option>nonadministrator</option>
+                </select>
+              </div>
             </div>
-            <div className="form-group col-md-6">
-              <label>Permissions</label>
-              <select
-                id="inputClass"
-                name="userClass"
-                className="form-control"
-                value={this.state.userClass}
-                onChange={this.handleChange}
-              >
-                <option>Choose...</option>
-                <option>administrator</option>
-                <option>nonadministrator</option>
-              </select>
-            </div>
+            {this.getImageUploader(
+              this.uploadNewUserPicture,
+              this.state.userClass
+            )}
+
             <button className="btn btn-primary">Create</button>
           </form>
           <div>{this.state.msg}</div>

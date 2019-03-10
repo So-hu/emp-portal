@@ -8,8 +8,11 @@ class EditUserForm extends Component {
     firstName: this.props.firstName,
     lastName: this.props.lastName,
     userClass: this.props.userClass,
+    signature: this.props.signature,
     onUserEdit: this.props.handleEdit,
     onChange: this.props.handleChange,
+    onPictureUpload: this.props.handlePictureUpload,
+    getUploader: this.props.getUploader,
     msg: this.props.msg
   };
 
@@ -81,6 +84,12 @@ class EditUserForm extends Component {
               <option>administrator</option>
               <option>nonadministrator</option>
             </select>
+          </div>
+          <div className="form-group col">
+            {this.props.getUploader(
+              this.state.onPictureUpload,
+              this.props.userClass
+            )}
           </div>
           <div className="form-group col">
             <button className="btn btn-primary">Save Changes</button>
