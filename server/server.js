@@ -587,6 +587,7 @@ app.get("/user/top5employess", function(req, res) {
           console.log(err);
           res.send("Error getting awardGiven");
         } else {
+          console.log(data)
           data = {
             employee1: data[0].Name,
             emp1Awards: data[0].Count,
