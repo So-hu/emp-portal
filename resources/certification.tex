@@ -9,6 +9,7 @@ lmargin=.5cm,rmargin=.5cm}
 \usepackage{xcolor}
 \usepackage{multicol}
 \usepackage{ulem}
+\graphicspath{{workingDirectory}}
 
 \begin{document}
 
@@ -42,8 +43,7 @@ As a thank you for your outstanding performance and dedication, we hereby recogn
 {\color{red}
 \scalebox{0.7}{
 \begin{tabular}{ccc}
-% \\ \includegraphics[width=1in, height=.5in]{\senderSignature} && {awardDate}
-\\ {senderSignature} && {awardDate}
+\\ \includegraphics[width=1in, height=.5in]{senderSignature} && {awardDate}
 \\ \hrulefill && \hrulefill
 \\ \sc{{senderFirstName} {senderLastName}} &&
 Date Awarded \\

@@ -32,7 +32,7 @@ function creatorInformation(awardID) {
 
     console.log("Getting SQL Query information");
     
-    var sql = "SELECT awardGiven.id, awardGiven.creatorID, awardGiven.date, e.id, e.firstName, e.lastName, e.email FROM awardGiven LEFT JOIN employee AS e ON awardGiven.creatorID = e.id WHERE awardGiven.id = ?";
+    var sql = "SELECT awardGiven.id, awardGiven.creatorID, awardGiven.date, e.id, e.firstName, e.lastName, e.email, e.signature FROM awardGiven LEFT JOIN user AS e ON awardGiven.creatorID = e.id WHERE awardGiven.id = ?";
     
     console.log("Connecting to DB to get query");
     
@@ -47,10 +47,6 @@ function creatorInformation(awardID) {
         awardInformation.creatorLastName = row.lastName;
         awardInformation.creatorSignature = row.signature;
         awardInformation.awardDate = row.date;
-        
-        console.log("Date is: " + awardInformation.awardDate);
-        
-        console.log("Signature file is: " + awardInformation.creatorSignature);
         
         recipientInfo(conn, awardInformation, awardID);
     });
@@ -127,7 +123,10 @@ function createLatex(awardInformation, awardID) {
     writeVar(f, "recipientLastName", awardInformation.recipientLastName)
     writeVar(f, "awardName", awardInformation.awardType)
     writeVar(f, "awardDate", awardInformation.awardDate)
-    writeVar(f, "senderSignature", "'" + awardInformation.creatorSignature + "'")
+    
+    tempPath = directory.replace(/\\/g, '/')
+    writeVar(f, "workingDirectory", tempPath + 'resources/signatures/')
+    writeVar(f, "senderSignature", awardInformation.creatorSignature)
 
     convertToPDF(fs, awardInformation, awardID)
 }
@@ -162,3 +161,5 @@ function sendEmail(awardID) {
     const email = require('./email.js')
     email(awardID);
 } 
+
+creatorInformation(187)

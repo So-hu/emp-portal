@@ -60,8 +60,8 @@ function createTransporter(emailInformation, awardID) {
         service: 'gmail',
         host: 'stmp.gmail.com',
         auth: {
-            user: '',
-            pass: ''
+            user: 'donotreplyzibalgroup@gmail.com',
+            pass: 'zibalgroup19'
         }
     });
 
