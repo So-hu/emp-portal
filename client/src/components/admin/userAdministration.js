@@ -65,7 +65,7 @@ class AdminConsole extends Component {
   };
 
   //input validator, returns an object with two members, error and isValid
-  isValidInput = (email, password, permissions) => {
+  isValidInput = (email, password, permissions, signature) => {
     var res = true;
     var errors = {};
     if (email.length === 0) {
@@ -80,6 +80,11 @@ class AdminConsole extends Component {
       res = false;
       errors.password = "User class is required";
     }
+    if (permissions === "nonadministrator" && signature.length !== 1) {
+      res = false;
+      errors.signature = "Signature file is required";
+    }
+
     return { errors, isValid: res };
   };
 
@@ -134,23 +139,22 @@ class AdminConsole extends Component {
       editUserClass,
       editSignature
     } = this.state;
+
     //Todo: validate edit input
+    const data = new FormData();
+    data.append("id", editId);
+    data.append("user", editEmail);
+    data.append("password", editPassword);
+    data.append("firstName", editFirstName);
+    data.append("lastName", editLastName);
+    data.append("userClass", editUserClass);
+    data.append("signature", editSignature[0]);
+
     this.setState({ msg: "" });
     let self = this;
     fetch("/admin/editUser", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        id: editId,
-        user: editEmail,
-        password: editPassword,
-        firstName: editFirstName,
-        lastName: editLastName,
-        userClass: editUserClass,
-        signature: editSignature
-      })
+      body: data
     })
       .then(res => {
         return res.text();
@@ -192,32 +196,33 @@ class AdminConsole extends Component {
       userClass,
       signature
     } = this.state;
-    var { errors, isValid } = this.isValidInput(email, password, userClass);
+    var { errors, isValid } = this.isValidInput(
+      email,
+      password,
+      userClass,
+      signature
+    );
     if (!isValid) {
       //if the input is invalid, set the errors state with the error object returned from isValidInput
       this.setState({ errors });
       return;
     }
-    if (userClass === "nonadministrator" && signature.length !== 1) {
-      this.setState({ msg: "Please upload one signature image." });
-      return;
-    }
     //valid input
+    console.log(signature);
     this.setState({ msg: "" });
     let self = this;
+
+    const data = new FormData();
+    data.append("user", email);
+    data.append("password", password);
+    data.append("firstName", firstName);
+    data.append("lastName", lastName);
+    data.append("userClass", userClass);
+    data.append("signature", signature[0]);
+
     fetch("/admin/addUser", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        user: email,
-        password: password,
-        firstName: firstName,
-        lastName: lastName,
-        userClass: userClass,
-        signature: signature
-      })
+      body: data
     })
       .then(res => {
         return res.text();
@@ -234,6 +239,7 @@ class AdminConsole extends Component {
       return (
         <div className="form-row">
           <ImageUploader
+            singleImage={true}
             withIcon={true}
             buttonText="Upload signature image"
             onChange={onChangeFunction}
@@ -357,7 +363,6 @@ class AdminConsole extends Component {
                 this.uploadNewUserPicture,
                 this.state.userClass
               )}
-
               <button className="btn btn-primary">Create</button>
             </form>
             <div>{this.state.msg}</div>
