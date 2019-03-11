@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Users from "./users";
 import Modal from "react-modal";
 import EditUserForm from "./editUserForm";
+import ImageUploader from "react-images-upload";
 
 const modalStyles = {
   content: {
@@ -24,6 +25,7 @@ class AdminConsole extends Component {
       firstName: "",
       lastName: "",
       userClass: "",
+      signature: [],
       msg: "",
       users: [],
       usersIsLoaded: false,
@@ -35,6 +37,7 @@ class AdminConsole extends Component {
       editFirstName: "",
       editLastName: "",
       editUserClass: "",
+      editSignature: [],
       editModalOpen: false,
       editMsg: ""
     };
@@ -62,7 +65,7 @@ class AdminConsole extends Component {
   };
 
   //input validator, returns an object with two members, error and isValid
-  isValidInput = (email, password, permissions) => {
+  isValidInput = (email, password, permissions, signature) => {
     var res = true;
     var errors = {};
     if (email.length === 0) {
@@ -77,6 +80,11 @@ class AdminConsole extends Component {
       res = false;
       errors.password = "User class is required";
     }
+    if (permissions === "nonadministrator" && signature.length !== 1) {
+      res = false;
+      errors.signature = "Signature file is required";
+    }
+
     return { errors, isValid: res };
   };
 
@@ -128,24 +136,25 @@ class AdminConsole extends Component {
       editPassword,
       editFirstName,
       editLastName,
-      editUserClass
+      editUserClass,
+      editSignature
     } = this.state;
+
     //Todo: validate edit input
+    const data = new FormData();
+    data.append("id", editId);
+    data.append("user", editEmail);
+    data.append("password", editPassword);
+    data.append("firstName", editFirstName);
+    data.append("lastName", editLastName);
+    data.append("userClass", editUserClass);
+    data.append("signature", editSignature[0]);
+
     this.setState({ msg: "" });
     let self = this;
     fetch("/admin/editUser", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        id: editId,
-        user: editEmail,
-        password: editPassword,
-        firstName: editFirstName,
-        lastName: editLastName,
-        userClass: editUserClass
-      })
+      body: data
     })
       .then(res => {
         return res.text();
@@ -158,6 +167,18 @@ class AdminConsole extends Component {
       });
   };
 
+  uploadNewUserPicture = picture => {
+    this.setState({
+      signature: picture
+    });
+  };
+
+  uploadEditUserPicture = picture => {
+    this.setState({
+      editSignature: picture
+    });
+  };
+
   //when any field in the form is changed, update the state to reflect the new values
   handleChange = event => {
     this.setState({
@@ -167,28 +188,41 @@ class AdminConsole extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    const { email, password, firstName, lastName, userClass } = this.state;
-    var { errors, isValid } = this.isValidInput(email, password, userClass);
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      userClass,
+      signature
+    } = this.state;
+    var { errors, isValid } = this.isValidInput(
+      email,
+      password,
+      userClass,
+      signature
+    );
     if (!isValid) {
       //if the input is invalid, set the errors state with the error object returned from isValidInput
       this.setState({ errors });
       return;
     }
     //valid input
+    console.log(signature);
     this.setState({ msg: "" });
     let self = this;
+
+    const data = new FormData();
+    data.append("user", email);
+    data.append("password", password);
+    data.append("firstName", firstName);
+    data.append("lastName", lastName);
+    data.append("userClass", userClass);
+    data.append("signature", signature[0]);
+
     fetch("/admin/addUser", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        user: email,
-        password: password,
-        firstName: firstName,
-        lastName: lastName,
-        userClass: userClass
-      })
+      body: data
     })
       .then(res => {
         return res.text();
@@ -198,6 +232,24 @@ class AdminConsole extends Component {
         self.setState({ msg: data });
         self.updateUsersTable();
       });
+  };
+
+  getImageUploader = (onChangeFunction, userClass) => {
+    if (userClass === "nonadministrator") {
+      return (
+        <div className="form-row">
+          <ImageUploader
+            singleImage={true}
+            withIcon={true}
+            buttonText="Upload signature image"
+            onChange={onChangeFunction}
+            imgExtension={[".jpg"]}
+            maxFileSize={5242880}
+            withPreview={true}
+          />
+        </div>
+      );
+    }
   };
 
   render() {
@@ -215,23 +267,30 @@ class AdminConsole extends Component {
             firstName={this.state.editFirstName}
             lastName={this.state.editLastName}
             userClass={this.state.editUserClass}
+            signature={this.state.editSignature}
             msg={this.state.msg}
             handleEdit={this.handleUserSubmitEdit}
             handleChange={this.handleChange}
+            handlePictureUpload={this.uploadEditUserPicture}
+            getUploader={this.getImageUploader}
           />
         </Modal>
-        <Users
-          error={this.state.usersError}
-          usersLoaded={this.state.usersIsLoaded}
-          users={this.state.users}
-          onUpdateUsersTable={this.updateUsersTable}
-          onUserEdit={this.handleUserOpenEdit}
-          onUserDelete={this.handleUserDelete}
-        />
+        <div className="card">
+          <h2 className="card-header text-center">Users</h2>
+          <Users
+            error={this.state.usersError}
+            usersLoaded={this.state.usersIsLoaded}
+            users={this.state.users}
+            onUpdateUsersTable={this.updateUsersTable}
+            onUserEdit={this.handleUserOpenEdit}
+            onUserDelete={this.handleUserDelete}
+          />
+        </div>
         <br />
-        <div>
-          <form onSubmit={this.handleSubmit}>
-            <div className="form-group col-md-6">
+        <div className="card">
+          <h4 className="card-header text-center">Add new user</h4>
+          <div className="card-body">
+            <form onSubmit={this.handleSubmit}>
               <div className="form-row">
                 <div className="form-group col-md-6">
                   <label>Email</label>
@@ -258,48 +317,56 @@ class AdminConsole extends Component {
                   />
                 </div>
               </div>
-            </div>
-            <div className="form-group col-md-6">
-              <label>First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                className="form-control"
-                id="inputFname"
-                placeholder="First Name"
-                value={this.state.firstName}
-                onChange={this.handleChange}
-              />
-            </div>
-            <div className="form-group col-md-6">
-              <label>Last name</label>
-              <input
-                type="text"
-                name="lastName"
-                className="form-control"
-                id="inputLname"
-                placeholder="Last Name"
-                value={this.state.lastName}
-                onChange={this.handleChange}
-              />
-            </div>
-            <div className="form-group col-md-6">
-              <label>Permissions</label>
-              <select
-                id="inputClass"
-                name="userClass"
-                className="form-control"
-                value={this.state.userClass}
-                onChange={this.handleChange}
-              >
-                <option>Choose...</option>
-                <option>administrator</option>
-                <option>nonadministrator</option>
-              </select>
-            </div>
-            <button className="btn btn-primary">Create</button>
-          </form>
-          <div>{this.state.msg}</div>
+              <div className="form-row">
+                <div className="form-group col-md-6">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    className="form-control"
+                    id="inputFname"
+                    placeholder="First Name"
+                    value={this.state.firstName}
+                    onChange={this.handleChange}
+                  />
+                </div>
+                <div className="form-group col-md-6">
+                  <label>Last name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    className="form-control"
+                    id="inputLname"
+                    placeholder="Last Name"
+                    value={this.state.lastName}
+                    onChange={this.handleChange}
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group col-md-6">
+                  <label>Permissions</label>
+                  <select
+                    id="inputClass"
+                    name="userClass"
+                    className="form-control"
+                    value={this.state.userClass}
+                    onChange={this.handleChange}
+                  >
+                    <option>Choose...</option>
+                    <option>administrator</option>
+                    <option>nonadministrator</option>
+                  </select>
+                </div>
+              </div>
+              {this.getImageUploader(
+                this.uploadNewUserPicture,
+                this.state.userClass
+              )}
+              <button className="btn btn-primary">Create</button>
+            </form>
+            <div>{this.state.msg}</div>
+          </div>
         </div>
       </div>
     );

@@ -84,6 +84,7 @@ class Reports extends Component {
             getData={this.getData1}
           />
         </div>
+        <br />
         <div className="row">
           <SmallReport
             title="Top award creators"
@@ -93,6 +94,7 @@ class Reports extends Component {
             getData={this.getData2}
           />
         </div>
+        <br />
         <div className="row">
           <SmallReport
             title="Awards per month"
@@ -102,6 +104,7 @@ class Reports extends Component {
             getData={this.getData3}
           />
         </div>
+        <br />
         <div className="row">
           <SmallReport
             title="Awards per year"

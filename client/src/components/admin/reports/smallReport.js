@@ -25,50 +25,52 @@ class SmallReport extends Component {
   render() {
     return (
       <div className="container-fluid">
-        <h3 class="text-center">{this.state.title}</h3>
-        <div className="row">
-          <div className="col-6">
-            <Chart
-              width={"600px"}
-              height={"400px"}
-              chartType={this.props.type}
-              loader={<div>Loading Chart</div>}
-              data={this.props.data.chartData}
-              options={{
-                title: this.props.data.chartTitle,
-                chartArea: { width: "50%" },
-                hAxis: {
-                  title: this.props.data.chartHTitle
-                }
-              }}
-            />
-          </div>
-          <div className="col-6">
-            <table className="table table-striped">
-              <thead>
-                <tr>
+        <div className="card">
+          <h3 class="text-center card-header">{this.state.title}</h3>
+          <div className="row">
+            <div className="col-md-6">
+              <Chart
+                width={"600px"}
+                height={"400px"}
+                chartType={this.props.type}
+                loader={<div>Loading Chart</div>}
+                data={this.props.data.chartData}
+                options={{
+                  title: this.props.data.chartTitle,
+                  chartArea: { width: "50%" },
+                  hAxis: {
+                    title: this.props.data.chartHTitle
+                  }
+                }}
+              />
+            </div>
+            <div className="col-md-6">
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    {this.props.data.jsonData
+                      ? this.props.data.jsonData.header.map(header => (
+                          <th>{header}</th>
+                        ))
+                      : null}
+                  </tr>
+                </thead>
+                <tbody>
                   {this.props.data.jsonData
-                    ? this.props.data.jsonData.header.map(header => (
-                        <th>{header}</th>
+                    ? this.props.data.jsonData.rows.map(row => (
+                        <tr>
+                          {row.map(item => (
+                            <td>{item}</td>
+                          ))}
+                        </tr>
                       ))
                     : null}
-                </tr>
-              </thead>
-              <tbody>
-                {this.props.data.jsonData
-                  ? this.props.data.jsonData.rows.map(row => (
-                      <tr>
-                        {row.map(item => (
-                          <td>{item}</td>
-                        ))}
-                      </tr>
-                    ))
-                  : null}
-              </tbody>
-            </table>
-            <button onClick={this.getDownload} className="btn btn-secondary">
-              Download .csv
-            </button>
+                </tbody>
+              </table>
+              <button onClick={this.getDownload} className="btn btn-secondary">
+                Download .csv
+              </button>
+            </div>
           </div>
         </div>
       </div>

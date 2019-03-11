@@ -93,8 +93,8 @@ class CustomReport extends Component {
   getDependentAdditionalOptions = () => {
     if (this.state.target === "awards") {
       return (
-        <>
-          <div className="form-group">
+        <div className="form-row">
+          <div className="form-group col-md-6">
             <label>and award type equals</label>
             <select
               name="awardType"
@@ -109,34 +109,36 @@ class CustomReport extends Component {
               ))}
             </select>
           </div>
-          <label>where date awarded is in the range</label>
-          <div className="input-group">
-            <input
-              type="date"
-              name="startDate"
-              className="form-control"
-              id="startDate"
-              value={this.state.startDate}
-              onChange={this.handleChange}
-            />
-            <div className="input-group-prepend">
-              <span className="input-group-text">to</span>
+          <div className="form-group col-md-6">
+            <label>where date awarded is in the range</label>
+            <div className="input-group">
+              <input
+                type="date"
+                name="startDate"
+                className="form-control"
+                id="startDate"
+                value={this.state.startDate}
+                onChange={this.handleChange}
+              />
+              <div className="input-group-prepend">
+                <span className="input-group-text">to</span>
+              </div>
+              <input
+                type="date"
+                name="endDate"
+                className="form-control"
+                id="endDate"
+                value={this.state.endDate}
+                onChange={this.handleChange}
+              />
             </div>
-            <input
-              type="date"
-              name="endDate"
-              className="form-control"
-              id="endDate"
-              value={this.state.endDate}
-              onChange={this.handleChange}
-            />
           </div>
-        </>
+        </div>
       );
     } else if (this.state.target === "employees") {
       return (
-        <>
-          <div className="form-group">
+        <div className="form-row">
+          <div className="form-group col">
             <label>and awards received is</label>
             <select
               name="awardComparator"
@@ -151,7 +153,7 @@ class CustomReport extends Component {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group col">
             <label>the following amount</label>
             <input
               type="number"
@@ -162,7 +164,7 @@ class CustomReport extends Component {
               onChange={this.handleChange}
             />
           </div>
-        </>
+        </div>
       );
     }
   };
@@ -170,61 +172,73 @@ class CustomReport extends Component {
   render() {
     return (
       <div className="container-fluid">
-        <h2>Business Intelligence Report Exporter</h2>
-        <p>
-          Set the following parameters to construct a query and receive a .csv
-          of the results.
-        </p>
-        <form onSubmit={this.getDownload}>
-          <div className="form-group">
-            <label>Export</label>
-            <select
-              required
-              name="target"
-              className="form-control"
-              id="target"
-              value={this.state.target}
-              onChange={this.handleChange}
-            >
-              <option />
-              {this.state.targets.map(target => (
-                <option value={target.value}>{target.displayName}</option>
-              ))}
-            </select>
-            <label>where</label>
-            <select
-              name="nameType"
-              className="form-control"
-              id="nameType"
-              value={this.state.queryTable}
-              onChange={this.handleChange}
-            >
-              <option value="" />
-              {this.getDependentNameParams()}
-            </select>
-            <label>matches</label>
-            <input
-              type="text"
-              name="name"
-              className="form-control"
-              id="name"
-              value={this.state.value}
-              onChange={this.handleChange}
-            />
-            {this.getDependentAdditionalOptions()}
-            <label>Desired filename</label>
-            <input
-              required
-              type="text"
-              name="fileName"
-              className="form-control"
-              id="fileName"
-              value={this.state.fileName}
-              onChange={this.handleChange}
-            />
+        <div className="card">
+          <h2 className="card-header">Business Intelligence Report Exporter</h2>
+          <div className="card-body">
+            <p className="card-text">
+              Set the following parameters to construct a query and receive a
+              .csv of the results.
+            </p>
+            <form onSubmit={this.getDownload}>
+              <div className="form-row">
+                <div className="form-group col-md-4">
+                  <label>Export</label>
+                  <select
+                    required
+                    name="target"
+                    className="form-control"
+                    id="target"
+                    value={this.state.target}
+                    onChange={this.handleChange}
+                  >
+                    <option />
+                    {this.state.targets.map(target => (
+                      <option value={target.value}>{target.displayName}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group col-md-4">
+                  <label>where</label>
+                  <select
+                    name="nameType"
+                    className="form-control"
+                    id="nameType"
+                    value={this.state.queryTable}
+                    onChange={this.handleChange}
+                  >
+                    <option value="" />
+                    {this.getDependentNameParams()}
+                  </select>
+                </div>
+                <div className="form-group col-md-4">
+                  <label>matches</label>
+                  <input
+                    type="text"
+                    name="name"
+                    className="form-control"
+                    id="name"
+                    value={this.state.value}
+                    onChange={this.handleChange}
+                  />
+                </div>
+              </div>
+              {this.getDependentAdditionalOptions()}
+              <div className="form-group">
+                <label>Desired filename</label>
+                <input
+                  required
+                  type="text"
+                  name="fileName"
+                  className="form-control"
+                  id="fileName"
+                  value={this.state.fileName}
+                  onChange={this.handleChange}
+                />
+              </div>
+              <button className="btn btn-primary">Get .csv</button>
+            </form>
           </div>
-          <button className="btn btn-primary">Get .csv</button>
-        </form>
+        </div>
       </div>
     );
   }
