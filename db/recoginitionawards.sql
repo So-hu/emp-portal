@@ -59,7 +59,7 @@ CREATE TABLE `awardGiven` (
   PRIMARY KEY (`id`),
   FOREIGN KEY (`awardTypeID`) REFERENCES awardType(id),
   FOREIGN KEY (`recipientID`) REFERENCES employee(id),
-  FOREIGN KEY (`creatorID`) REFERENCES user(id)
+  FOREIGN KEY (`creatorID`) REFERENCES user(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 --

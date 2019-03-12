@@ -111,6 +111,8 @@ function writeVar(file, placeholder, text) {
 ************************************************/
 function createLatex(awardInformation, awardID) {
     var f = directory + 'resources/awards/insertinformation.tex';
+    fs.writeFileSync(f, '')
+
     var original = directory + 'resources/certification.tex'
     
     fs.copyFile(original, f, (err) => {
@@ -149,6 +151,10 @@ function convertToPDF(filesystem, awardInformation, awardID) {
     
     pdf.on('finish', function(error) {
         console.log("PDF Finished");
+        fs.unlink(directory + 'resources/awards/insertinformation.tex', function (err) {
+            if (err) throw err;
+            console.log('temptex deleted!');
+        });
         sendEmail(awardID);
     })
 }
