@@ -15,7 +15,7 @@ const config = require("./config.js");
 var conn = mysql.createConnection(config);
 
 // Path for Directory
-const directory = path.join(__dirname, '../');
+const directory = path.join(__dirname, "../");
 
 //Using for sending download urls
 //TODO: change to production url
@@ -49,9 +49,9 @@ app.get("/employeeData", function(req, res) {
 
 //Get awards history
 app.get("/awardsData", function(req, res) {
-  if(req.query.id != ""){
+  if (req.query.id != "") {
     conn.query(
-      "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+      "SELECT awardGiven.id, date, awardType.name as type,  employee.firstName as recipientFirst, \
       employee.lastName as recipientLast, user.firstName as creatorFirst, \
       user.lastName as creatorLast FROM awardrecognition.awardGiven \
       JOIN awardType on awardGiven.awardTypeID=awardType.id \
@@ -68,9 +68,7 @@ app.get("/awardsData", function(req, res) {
         }
       }
     );
-  }
-
-  else{
+  } else {
     conn.query(
       "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
       employee.lastName as recipientLast, user.firstName as creatorFirst, \
@@ -397,12 +395,27 @@ app.post("/user/addAward", function(req, res) {
 
               var awardID = row.insertId;
               console.log("Award successfully granted.");
-              var certificate = require(directory + '/resources/certificate.js')
+              var certificate = require(directory +
+                "/resources/certificate.js");
               certificate(awardID);
               res.send(msg);
             }
           }
         );
+      }
+    }
+  );
+});
+
+app.post("/deleteAward", function(req, res) {
+  conn.query(
+    "DELETE from awardGiven WHERE id = ?",
+    [req.body.awardId],
+    function(err) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send("Successfully Deleted Award");
       }
     }
   );
@@ -656,23 +669,21 @@ app.get("/user/top5employess", function(req, res) {
           console.log(err);
           res.send("Error getting awardGiven");
         } else {
-          if(Object.keys(data).length < 5)
-          {
+          if (Object.keys(data).length < 5) {
             data = {
               employee1: "N/A",
               emp1Awards: 0,
-              employee2:  "N/A",
+              employee2: "N/A",
               emp2Awards: 0,
-              employee3:  "N/A",
+              employee3: "N/A",
               emp3Awards: 0,
-              employee4:  "N/A",
+              employee4: "N/A",
               emp4Awards: 0,
-              employee5:  "N/A",
+              employee5: "N/A",
               emp5Awards: 0
             };
             res.send(data);
-          }
-          else{
+          } else {
             data = {
               employee1: data[0].Name,
               emp1Awards: data[0].Count,
@@ -686,7 +697,7 @@ app.get("/user/top5employess", function(req, res) {
               emp5Awards: data[4].Count
             };
             res.send(data);
-        }
+          }
         }
       }
     );
@@ -728,7 +739,7 @@ app.get("/user/top5employess", function(req, res) {
 app.get("/user/awardsData", function(req, res) {
   if (req.query.id != "") {
     conn.query(
-      "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+      "SELECT awardGiven.id, date, awardType.name as type,  employee.firstName as recipientFirst, \
       employee.lastName as recipientLast \
       FROM awardrecognition.awardGiven \
       JOIN awardType on awardGiven.awardTypeID=awardType.id \
@@ -987,7 +998,11 @@ app.post("/userAuth", function(req, res) {
         bcrypt.compare(password, data[0].password, function(err, isMatch) {
           if (isMatch) {
             result.valid = true;
-            result.user = {userClass: data[0].userClass, firstName: data[0].firstName, lastName: data[0].lastName};
+            result.user = {
+              userClass: data[0].userClass,
+              firstName: data[0].firstName,
+              lastName: data[0].lastName
+            };
           } else {
             result.msg = "Username and password do not match";
           }

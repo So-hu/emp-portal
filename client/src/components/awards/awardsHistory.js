@@ -9,7 +9,8 @@ class awardsHistory extends Component {
     this.state = {
       error: null,
       isLoaded: false,
-      awards: []
+      awards: [],
+      msg: ""
     };
   }
 
@@ -17,36 +18,69 @@ class awardsHistory extends Component {
     this.setState({ mounted: true });
 
     let userAccountSettings = [];
-    fetch('/user/account?email=' + store.getState().userName)
-        .then(response => {
-            return response.json();
-        })
-        .then(data => {
-            //TODO: Need to add company name into the database
-            userAccountSettings = data.map((user) => { return {id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email }})
-            this.setState({userSettings: userAccountSettings});
-            this.setState({ 
-                id: this.state.userSettings[0].id,
-                firstName: this.state.userSettings[0].firstName, 
-                lastName: this.state.userSettings[0].lastName,
-                email: this.state.userSettings[0].email,
-               });
-               //console.log("id sent " + this.state.id);
-               fetch("/awardsData?id=" + this.state.id) //uses the proxy to send request to server for data
-               .then(res => res.json())
-               .then(
-                 awards =>
-                   this.setState({ isLoaded: true, awards }, () =>
-                     console.log("Awards fetched..", awards)
-                   ),
-                 error => {
-                   this.setState({ isLoaded: true, error });
-                 }
-               );
-        }).catch(error => {
-          console.log(error);
+    fetch("/user/account?email=" + store.getState().userName)
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        //TODO: Need to add company name into the database
+        userAccountSettings = data.map(user => {
+          return {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+          };
         });
+        this.setState({ userSettings: userAccountSettings });
+        this.setState({
+          id: this.state.userSettings[0].id,
+          firstName: this.state.userSettings[0].firstName,
+          lastName: this.state.userSettings[0].lastName,
+          email: this.state.userSettings[0].email
+        });
+        //console.log("id sent " + this.state.id);
+        this.updateAwardsHistory();
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
+
+  updateAwardsHistory = () => {
+    fetch("/awardsData?id=" + this.state.id) //uses the proxy to send request to server for data
+      .then(res => res.json())
+      .then(
+        awards =>
+          this.setState({ isLoaded: true, awards }, () =>
+            console.log("Awards fetched..", awards)
+          ),
+        error => {
+          this.setState({ isLoaded: true, error });
+        }
+      );
+  };
+
+  handleAwardDelete = id => {
+    console.log("Deleting award " + id);
+    let self = this;
+    fetch("/deleteAward", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        awardId: id
+      })
+    })
+      .then(res => {
+        return res.text();
+      })
+      .then(function(data) {
+        self.setState({ msg: data });
+        self.updateAwardsHistory();
+      });
+  };
 
   render() {
     if (this.state.error) {
@@ -62,6 +96,7 @@ class awardsHistory extends Component {
               <th>Date</th>
               <th>Type</th>
               <th>Awarded To</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -71,6 +106,14 @@ class awardsHistory extends Component {
                 <td>{awards.type}</td>
                 <td>
                   {awards.recipientFirst} {awards.recipientLast}
+                </td>
+                <td>
+                  <button
+                    onClick={() => this.handleAwardDelete(awards.id)}
+                    className="btn btn-danger"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
