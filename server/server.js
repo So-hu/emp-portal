@@ -14,6 +14,9 @@ const mysql = require("mysql");
 const config = require("./config.js");
 var conn = mysql.createConnection(config);
 
+// Path for Directory
+const directory = path.join(__dirname, '../');
+
 //Using for sending download urls
 //TODO: change to production url
 const baseUrl = "http://localhost:5000";
@@ -377,24 +380,27 @@ app.post("/user/addAward", function(req, res) {
         //Use id from above query to find the recipient
         recipientID = result[0].id;
         //TODO: get creatorID from currently logged in user
-        creatorID = 10;
         conn.query(
           "INSERT INTO awardGiven (awardTypeID, recipientID, creatorID, date, time) VALUES(?,?,?,?,?)",
           [
             req.body.awardTypeID,
             recipientID,
-            creatorID,
+            req.body.creatorID,
             req.body.date,
             req.body.time
           ],
-          function(err) {
+          function(err, row) {
             if (err) {
               console.log(err);
               msg = "Award failed.";
               res.send(msg);
             } else {
               msg = "Award successfully granted.";
+
+              var awardID = row.insertId;
               console.log("Award successfully granted.");
+              var certificate = require(directory + '/resources/certificate.js')
+              certificate(awardID);
               res.send(msg);
             }
           }
@@ -584,6 +590,7 @@ app.get("/report/awardsByYear", function(req, res) {
 });
 
 app.get("/user/awardsgiven", function(req, res) {
+  //res.json({"total":100});
   var eom = 0; //employee of the month counter
   var eow = 0; //employee of the week counter
   var hsm = 0; //highest sale of the month
@@ -901,7 +908,7 @@ app.post("/user/account", function(req, res) {
     lastName: req.body.lastName,
     email: req.body.email
   };
-  if (req.body.password != "") {
+  if (req.body.password != " ") {
     bcrypt.genSalt(10, function(err, salt) {
       bcrypt.hash(req.body.password, salt, function(err, hash) {
         changes.password = hash;
@@ -982,11 +989,7 @@ app.post("/userAuth", function(req, res) {
         bcrypt.compare(password, data[0].password, function(err, isMatch) {
           if (isMatch) {
             result.valid = true;
-            result.user = {
-              userClass: data[0].userClass,
-              firstName: data[0].firstName,
-              lastName: data[0].lastName
-            };
+            result.user = {userClass: data[0].userClass, firstName: data[0].firstName, lastName: data[0].lastName};
           } else {
             result.msg = "Username and password do not match";
           }

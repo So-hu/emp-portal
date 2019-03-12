@@ -152,6 +152,7 @@ class CreateAwardForm extends Component {
             awardTypeID: this.state.awardClass,
             date: this.state.sendDate,
             time: this.state.sendTime,
+            creatorID: this.state.userSettings[0].id,
             firstName: this.state.employeeFirstName,
             lastName: this.state.employeeLastName,
             email: this.state.employeeEmail
@@ -182,6 +183,7 @@ class CreateAwardForm extends Component {
                     awardTypeID: this.state.awardClass,
                     date: this.state.sendDate,
                     time: this.state.sendTime,
+                    creatorID: this.state.userSettings[0].id,
                     firstName: this.state.employeeFirstName,
                     lastName: this.state.employeeLastName,
                     email: this.state.employeeEmail
