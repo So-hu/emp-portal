@@ -91,12 +91,10 @@ app.get("/awardsData", function(req, res) {
 });
 
 app.post("/getQueryCsv", function(req, res) {
-  const directory = path.join(__dirname, "../");
-
   var fileName = req.body.fileName;
 
   const filePrefix = fileName ? fileName : "custom-report" + Date.now();
-  const file = directory + "/server/public/reports/" + filePrefix + ".csv";
+  const file = directory + "server/public/reports/" + filePrefix + ".csv";
   var url = baseUrl + "/download-report?report=" + filePrefix;
 
   var target = req.body.target;
@@ -333,9 +331,9 @@ app.post("/admin/addUser", function(req, res) {
                   res.send(msg);
                 } else {
                   let signatureFile = req.files.signature;
-                  const directory = "server/signatures/";
+                  const destination = directory + "/resources/signatures/";
                   const filename = results.insertId + ".jpg";
-                  signatureFile.mv(directory + filename, function(err) {
+                  signatureFile.mv(destination + filename, function(err) {
                     if (err) {
                       res.status(500).send(err);
                     } else {
@@ -420,9 +418,9 @@ app.post("/admin/editUser", function(req, res) {
   // Check if new signature file uploaded, and add to changes if present
   if (req.files) {
     let signatureFile = req.files.signature;
-    const directory = "server/signatures/";
+    const destination = directory + "/resources/signatures/";
     const filename = req.body.id + ".jpg";
-    signatureFile.mv(directory + filename, function(err) {
+    signatureFile.mv(destination + filename, function(err) {
       if (err) {
         res.status(500).send(err);
       } else {
@@ -1002,8 +1000,6 @@ app.post("/userAuth", function(req, res) {
 
 //Front end calls this function to construct the .csv, and send a download url
 app.get("/getDownloadUrl", function(req, res) {
-  const directory = path.join(__dirname, "../");
-
   var report = req.query.report;
   const file = directory + "/server/public/reports/" + report + ".csv";
   var url = baseUrl + "/download-report?report=" + report;
