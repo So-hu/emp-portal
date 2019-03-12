@@ -656,7 +656,7 @@ app.get("/user/top5employess", function(req, res) {
           console.log(err);
           res.send("Error getting awardGiven");
         } else {
-          if(Object.keys(data).length === 0)
+          if(Object.keys(data).length < 5)
           {
             data = {
               employee1: "N/A",
