@@ -243,7 +243,7 @@ class AdminConsole extends Component {
             withIcon={true}
             buttonText="Upload signature image"
             onChange={onChangeFunction}
-            imgExtension={[".jpg"]}
+            imgExtension={[".jpg", ".gif", ".png"]}
             maxFileSize={5242880}
             withPreview={true}
           />

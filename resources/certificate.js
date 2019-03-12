@@ -161,5 +161,3 @@ function sendEmail(awardID) {
     const email = require('./email.js')
     email(awardID);
 } 
-
-creatorInformation(187)
