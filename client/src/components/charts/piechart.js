@@ -34,7 +34,7 @@ class Piechart extends Component{
                    fetch('/user/awardsgiven?id=' + this.state.id)
                    .then(res => res.json())
                    .then((awards) => {
-                     if(awards.eom === 0 || awards.eow === 0 || awards.hsm === 0 )
+                     if(awards.eom === 0 && awards.eow === 0 && awards.hsm === 0 )
                      {
                        awards = {"eom":0,"eow":0,"hsm":0,"unknown":1};
                        this.setState({ awards });
