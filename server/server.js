@@ -326,7 +326,7 @@ app.post("/admin/addUser", function(req, res) {
                   msg = "Email Already in Use";
                   console.log(err);
                   res.send(msg);
-                } else {
+                } else if (req.files) {
                   let signatureFile = req.files.signature;
                   const destination = directory + "/resources/signatures/";
                   const filename = results.insertId + ".jpg";
@@ -348,6 +348,9 @@ app.post("/admin/addUser", function(req, res) {
                       );
                     }
                   });
+                } else {
+                  msg = "Successfully Added User";
+                  res.send(msg);
                 }
               }
             );
