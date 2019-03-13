@@ -20,7 +20,6 @@ const directory = path.join(__dirname, "../");
 //Using for sending download urls
 const ip = require("ip");
 const baseUrl = "http://" + ip.address() + ":" + port;
-console.log(baseUrl);
 
 conn.connect(function(err) {
   if (err) {
