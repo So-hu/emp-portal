@@ -18,8 +18,9 @@ var conn = mysql.createConnection(config);
 const directory = path.join(__dirname, "../");
 
 //Using for sending download urls
-//TODO: change to production url
-const baseUrl = "http://localhost:5000";
+const ip = require("ip");
+const baseUrl = "http://" + ip.address() + ":" + port;
+console.log(baseUrl);
 
 conn.connect(function(err) {
   if (err) {
