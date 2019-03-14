@@ -110,7 +110,7 @@ function writeVar(file, placeholder, text) {
 ** Create LaTex file
 ************************************************/
 function createLatex(awardInformation, awardID) {
-    var f = directory + 'resources/awards/insertinformation.tex';
+    var f = directory + directory + 'resources/awards/' + awardID + '.tex';
     fs.writeFileSync(f, '')
 
     var original = directory + 'resources/certification.tex'
