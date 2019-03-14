@@ -18,7 +18,7 @@ var conn = mysql.createConnection(config);
 const directory = path.join(__dirname, "../");
 
 //Using for sending download urls
-const baseUrl = "http://35.188.208.255" + ":" + port;
+const baseUrl = "http://35.225.185.227" + ":" + port;
 
 conn.connect(function(err) {
   if (err) {
