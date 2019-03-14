@@ -18,7 +18,7 @@ var conn = mysql.createConnection(config);
 const directory = path.join(__dirname, "../");
 
 //Using for sending download urls
-const baseUrl = "http://35.188.208.255" + ":" + port;
+const baseUrl = "http://35.225.185.227" + ":" + port;
 
 conn.connect(function(err) {
   if (err) {
@@ -50,7 +50,7 @@ app.get("/employeeData", function(req, res) {
 app.get("/awardsData", function(req, res) {
   if (req.query.id != "") {
     conn.query(
-      "SELECT awardGiven.id, date, awardType.name as type,  employee.firstName as recipientFirst, \
+      "SELECT awardGiven.id, date, time, awardType.name as type,  employee.firstName as recipientFirst, \
       employee.lastName as recipientLast, user.firstName as creatorFirst, \
       user.lastName as creatorLast FROM awardrecognition.awardGiven \
       JOIN awardType on awardGiven.awardTypeID=awardType.id \
@@ -741,7 +741,7 @@ app.get("/user/top5employess", function(req, res) {
 app.get("/user/awardsData", function(req, res) {
   if (req.query.id != "") {
     conn.query(
-      "SELECT awardGiven.id, date, awardType.name as type,  employee.firstName as recipientFirst, \
+      "SELECT awardGiven.id, date, time, awardType.name as type,  employee.firstName as recipientFirst, \
       employee.lastName as recipientLast \
       FROM awardrecognition.awardGiven \
       JOIN awardType on awardGiven.awardTypeID=awardType.id \
@@ -760,7 +760,7 @@ app.get("/user/awardsData", function(req, res) {
     );
   } else {
     conn.query(
-      "SELECT date, awardType.name as type,  employee.firstName as recipientFirst, \
+      "SELECT date, time, awardType.name as type,  employee.firstName as recipientFirst, \
     employee.lastName as recipientLast \
     FROM awardrecognition.awardGiven \
     JOIN awardType on awardGiven.awardTypeID=awardType.id \
