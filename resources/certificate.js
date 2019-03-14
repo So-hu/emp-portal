@@ -140,7 +140,7 @@ function createLatex(awardInformation, awardID) {
 function convertToPDF(filesystem, awardInformation, awardID) {
     console.log("Converting to PDF");
     
-    const input = filesystem.createReadStream(directory + 'resources/awards/insertinformation.tex');
+    const input = filesystem.createReadStream(directory + 'resources/awards/' + awardID + '.tex');
     const output = filesystem.createWriteStream(directory + 'resources/awards/' + awardID + '.pdf');
     
     console.log("Latex input\n");
@@ -151,7 +151,7 @@ function convertToPDF(filesystem, awardInformation, awardID) {
     
     pdf.on('finish', function(error) {
         console.log("PDF Finished");
-        fs.unlink(directory + 'resources/awards/insertinformation.tex', function (err) {
+        fs.unlink(directory + 'resources/awards/' + awardID + '.tex', function (err) {
             if (err) throw err;
             console.log('temptex deleted!');
         });
