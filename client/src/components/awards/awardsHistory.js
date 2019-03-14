@@ -94,6 +94,7 @@ class awardsHistory extends Component {
           <thead>
             <tr>
               <th>Date</th>
+              <th>Time</th>
               <th>Type</th>
               <th>Awarded To</th>
               <th>Actions</th>
@@ -103,6 +104,7 @@ class awardsHistory extends Component {
             {this.state.awards.map(awards => (
               <tr>
                 <td>{awards.date}</td>
+                <td>{awards.time}</td>
                 <td>{awards.type}</td>
                 <td>
                   {awards.recipientFirst} {awards.recipientLast}
