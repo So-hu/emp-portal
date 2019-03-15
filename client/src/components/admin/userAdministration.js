@@ -122,6 +122,7 @@ class AdminConsole extends Component {
       editEmail: editUser.email,
       editFirstName: editUser.firstName,
       editLastName: editUser.lastName,
+      editPassword: "",
       editUserClass: editUser.userClass,
       editModalOpen: true
     });
