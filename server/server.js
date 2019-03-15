@@ -425,7 +425,6 @@ app.post("/deleteAward", function(req, res) {
 
 app.post("/admin/editUser", function(req, res) {
   var changes = {
-    userClass: req.body.userClass,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.user
@@ -990,7 +989,7 @@ app.post("/userAuth", function(req, res) {
   }*/
   var result = { valid: false, user: {}, msg: "" };
   conn.query(
-    "SELECT password, userClass, firstName, lastName from user WHERE email= ?",
+    "SELECT id, password, userClass, firstName, lastName from user WHERE email= ?",
     [user],
     function(err, data) {
       if (data.length == 0) {
@@ -1003,7 +1002,8 @@ app.post("/userAuth", function(req, res) {
             result.user = {
               userClass: data[0].userClass,
               firstName: data[0].firstName,
-              lastName: data[0].lastName
+              lastName: data[0].lastName,
+              id: data[0].id
             };
           } else {
             result.msg = "Username and password do not match";

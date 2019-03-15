@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Modal from "react-modal";
+import store from "../../store/store";
 
 class Users extends Component {
   state = {};
@@ -7,6 +8,19 @@ class Users extends Component {
   componentDidMount() {
     this.props.onUpdateUsersTable();
   }
+
+  getDeleteButton = id => {
+    if (store.getState().userData.id !== id) {
+      return (
+        <button
+          onClick={() => this.props.onUserDelete(id)}
+          className="btn btn-danger"
+        >
+          Delete
+        </button>
+      );
+    }
+  };
 
   render() {
     const { onUserDelete, onUserEdit, users, error, usersLoaded } = this.props;
@@ -38,17 +52,12 @@ class Users extends Component {
                 <td>{user.accountCreated}</td>
                 <td>
                   <button
-                    onClick={() => onUserEdit(user.id)}
+                    onClick={() => onUserEdit(user.id, onUserDelete)}
                     className="btn btn-primary"
                   >
                     Edit
                   </button>
-                  <button
-                    onClick={() => onUserDelete(user.id)}
-                    className="btn btn-danger"
-                  >
-                    Delete
-                  </button>
+                  {this.getDeleteButton(user.id)}
                 </td>
               </tr>
             ))}
