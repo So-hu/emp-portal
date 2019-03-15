@@ -75,20 +75,6 @@ class EditUserForm extends Component {
                 />
               </div>
               <div className="form-group col">
-                <label>Permissions</label>
-                <select
-                  required
-                  name="editUserClass"
-                  className="form-control"
-                  onChange={this.state.onChange}
-                  defaultValue={this.state.userClass}
-                >
-                  <option />
-                  <option>administrator</option>
-                  <option>nonadministrator</option>
-                </select>
-              </div>
-              <div className="form-group col">
                 {this.props.getUploader(
                   this.state.onPictureUpload,
                   this.props.userClass

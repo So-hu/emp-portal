@@ -67,9 +67,9 @@ CREATE TABLE `awardGiven` (
 --
 
 INSERT INTO `user` (`firstName`, `lastName`, `userClass`, `email`, `password`, `signature`) VALUES
-('Indiana', 'Jones', 'administrator', 'IndianaJones@rocks.com', 'indianajones', 'indianajonessignature.jpg'),
-('Jared', 'Goff', 'nonadministrator', 'jaredgoff@beatthepatriots.com', 'jaredgoff', 'jaredgoffsignature.jpg'),
-('Steve', 'Rogers', 'nonadministrator', 'steverogers@captainamerica.com', 'steverogers', 'steverogerssignature.jpg');
+('Indiana', 'Jones', 'administrator', 'IndianaJones@rocks.com', 'indianajones', '1.jpg'),
+('Jared', 'Goff', 'nonadministrator', 'jaredgoff@beatthepatriots.com', 'jaredgoff', '2.jpg'),
+('Steve', 'Rogers', 'nonadministrator', 'steverogers@captainamerica.com', 'steverogers', '3.jpg');
 
 --
 -- Dumping data for table `awardType`
@@ -77,7 +77,7 @@ INSERT INTO `user` (`firstName`, `lastName`, `userClass`, `email`, `password`, `
 
 INSERT INTO `awardType` (`name`, `description`) VALUES
 ('Employee of the Month', 'Award given to the employee of the month'),
-('Employee of the Year', 'Award given to the employee of the week'),
+('Employee of the Year', 'Award given to the employee of the year'),
 ('Highest Sales in a Month', 'Award given to employee who sold the most products');
 
 --

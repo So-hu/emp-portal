@@ -83,6 +83,7 @@ class AdminConsole extends Component {
     if (permissions === "nonadministrator" && signature.length !== 1) {
       res = false;
       errors.signature = "Signature file is required";
+      this.setState({ msg: "Please attach a valid signature image." });
     }
 
     return { errors, isValid: res };
@@ -122,6 +123,7 @@ class AdminConsole extends Component {
       editEmail: editUser.email,
       editFirstName: editUser.firstName,
       editLastName: editUser.lastName,
+      editPassword: "",
       editUserClass: editUser.userClass,
       editModalOpen: true
     });
@@ -135,7 +137,6 @@ class AdminConsole extends Component {
       editPassword,
       editFirstName,
       editLastName,
-      editUserClass,
       editSignature
     } = this.state;
 
@@ -146,7 +147,6 @@ class AdminConsole extends Component {
     data.append("password", editPassword);
     data.append("firstName", editFirstName);
     data.append("lastName", editLastName);
-    data.append("userClass", editUserClass);
     data.append("signature", editSignature[0]);
 
     this.setState({ msg: "" });
@@ -207,7 +207,6 @@ class AdminConsole extends Component {
       return;
     }
     //valid input
-    console.log(signature);
     this.setState({ msg: "" });
     let self = this;
 
@@ -294,6 +293,7 @@ class AdminConsole extends Component {
                 <div className="form-group col-md-6">
                   <label>Email</label>
                   <input
+                    required
                     type="email"
                     name="email"
                     className="form-control"
@@ -306,6 +306,7 @@ class AdminConsole extends Component {
                 <div className="form-group col-md-6">
                   <label>Password</label>
                   <input
+                    required
                     type="password"
                     name="password"
                     className="form-control"
@@ -320,6 +321,7 @@ class AdminConsole extends Component {
                 <div className="form-group col-md-6">
                   <label>First Name</label>
                   <input
+                    required
                     type="text"
                     name="firstName"
                     className="form-control"
@@ -332,6 +334,7 @@ class AdminConsole extends Component {
                 <div className="form-group col-md-6">
                   <label>Last name</label>
                   <input
+                    required
                     type="text"
                     name="lastName"
                     className="form-control"
@@ -346,6 +349,7 @@ class AdminConsole extends Component {
                 <div className="form-group col-md-6">
                   <label>Permissions</label>
                   <select
+                    required
                     id="inputClass"
                     name="userClass"
                     className="form-control"
