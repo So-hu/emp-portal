@@ -120,7 +120,6 @@ class AdminConsole extends Component {
     this.setState({
       editId: id,
       editEmail: editUser.email,
-      editPassword: editUser.password,
       editFirstName: editUser.firstName,
       editLastName: editUser.lastName,
       editUserClass: editUser.userClass,
