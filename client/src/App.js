@@ -3,6 +3,7 @@ import "./App.css";
 import Employees from "./components/employees/employees";
 import LogOutPage from "./components/LogOutPage";
 import Login from "./pages/login";
+import Recovery from "./pages/recovery";
 import Navbar from "./components/navbar/navbar";
 import Piechart from "./components/charts/piechart";
 import Barchart from "./components/charts/barchart";
@@ -43,27 +44,15 @@ class App extends Component {
         <Router>
           <div>
             <Navbar routes={this.state.routes} />
-            <Route path="/" exact strict component={Login} />
+            <Route path="/" exact component={Login} />
             {this.state.loggedIn ? (
-              <Route path="/employees" strict component={Employees} />
-            ) : (
-              <Redirect to="/" />
-            )}
-            {this.state.loggedIn ? (
+              [<Route path="/employees" strict component={Employees} />,
               <Route
                 path="/user+administration"
                 strict
                 component={AdminConsole}
-              />
-            ) : (
-              <Redirect to="/" />
-            )}
-            {this.state.loggedIn ? (
-              <Route path="/reports" strict component={Reports} />
-            ) : (
-              <Redirect to="/" />
-            )}
-            {this.state.loggedIn ? (
+              />,
+              <Route path="/reports" strict component={Reports} />,
               <Route
                 path="/homepage"
                 exact
@@ -88,25 +77,14 @@ class App extends Component {
                     </div>
                   );
                 }}
-              />
+              />,
+              <Route path="/newaward" strict component={CreateAwardForm} />,
+              <Route path="/account" strict component={UserAccount} />,
+              <Route path="/awardshistory" strict component={awardsHistory} />]
             ) : (
               <Redirect to="/" />
             )}
-            {this.state.loggedIn ? (
-              <Route path="/newaward" strict component={CreateAwardForm} />
-            ) : (
-              <Redirect to="/" />
-            )}
-            {this.state.loggedIn ? (
-              <Route path="/account" strict component={UserAccount} />
-            ) : (
-              <Redirect to="/" />
-            )}
-            {this.state.loggedIn ? (
-              <Route path="/awardshistory" strict component={awardsHistory} />
-            ) : (
-              <Redirect to="/" />
-            )}
+            <Route path="/recovery" exact component={Recovery}/>
             <Route path="/logout" strict component={LogOutPage} />
           </div>
         </Router>

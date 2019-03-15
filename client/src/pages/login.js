@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import store from "../store/store";
 import { logIn } from "../store/actions";
 import { Redirect } from "react-router-dom";
+import { NavLink } from 'react-router-dom'
 import "./login.css";
 
 class Login extends Component {
@@ -120,6 +121,8 @@ class Login extends Component {
           <br />
           <div>{errors.password}</div>
           <button className="btn btn-primary">Login</button>
+          <br></br><br></br>
+          <NavLink to="/recovery" > Recover Password </NavLink>
         </form>
       </div>
     );

@@ -16,7 +16,7 @@ var conn = mysql.createConnection(config);
 
 // Path for Directory
 const directory = path.join(__dirname, "../");
-
+const nodemailer = require(directory + 'node_modules/nodemailer');
 //Using for sending download urls
 const baseUrl = "http://35.225.185.227" + ":" + port;
 
@@ -421,6 +421,60 @@ app.post("/deleteAward", function(req, res) {
       }
     }
   );
+});
+
+function createTransporter(emailInformation, password) {
+  console.log('sending')
+  var smtpTransport = nodemailer.createTransport({
+      service: 'gmail',
+      host: 'stmp.gmail.com',
+      auth: {
+          user: 'donotreplyzibalgroup@gmail.com',
+          pass: 'zibalgroup19'
+      }
+  });
+
+  var message = {
+      from: 'ZibalGroup',
+      to: emailInformation,
+      subject: "Password Reset",
+      html: 
+          '<p>Your new password is ' + password + '</p>',
+  }
+
+  smtpTransport.sendMail(message, function(error, info) {
+      if (error)
+          throw error;
+
+      console.log("Email sent");
+  })
+}
+
+app.post("/recovery", function(req, res) {
+  console.log('recovering password')
+    var chars = "abcdefghijklmnopqrstuvwxyz!@#$%^&*()-+<>ABCDEFGHIJKLMNOP1234567890";
+    var pass = "";
+    for (var x = 0; x < 10; x++) {
+      var i = Math.floor(Math.random() * chars.length);
+      pass += chars.charAt(i);   
+    }
+    bcrypt.genSalt(10, function(err, salt) {
+      bcrypt.hash(pass, salt, function(err, hash) {
+        em = req.body.email
+        conn.query(
+          "UPDATE user SET password=? WHERE email=?",
+          [hash, em],
+          function(err) {
+            if (err) {
+             console.log(err)
+            } else {
+            }
+          })
+      })
+    })
+    var emailInformation = req.body.email
+    console.log(emailInformation)
+    createTransporter(emailInformation, pass)
 });
 
 app.post("/admin/editUser", function(req, res) {
