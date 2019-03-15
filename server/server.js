@@ -455,7 +455,7 @@ app.post("/recovery", function(req, res) {
     var chars = "abcdefghijklmnopqrstuvwxyz!@#$%^&*()-+<>ABCDEFGHIJKLMNOP1234567890";
     var pass = "";
     for (var x = 0; x < 10; x++) {
-      var i = Math.floor(Math.random() * chars.length);
+      var i = Math.floor(Math.random() * (chars.length - 1));
       pass += chars.charAt(i);   
     }
     bcrypt.genSalt(10, function(err, salt) {
