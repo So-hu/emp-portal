@@ -443,7 +443,7 @@ app.post("/admin/editUser", function(req, res) {
       }
     });
   }
-  if (req.body.password != "") {
+  if (req.body.password && req.body.password != "") {
     bcrypt.genSalt(10, function(err, salt) {
       bcrypt.hash(req.body.password, salt, function(err, hash) {
         changes.password = hash;
