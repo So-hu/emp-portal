@@ -16,7 +16,7 @@
     "express": "^4.16.4",
     "express-fileupload": "^1.1.2-alpha.1",
     "ip": "^1.1.5",
-    "jsonwebtoken": "^8.5.0",
+    "jsonwebtoken": "^9.0.0",
     "mysql": "^2.16.0",
     "node-latex": "^2.4.4",
     "nodemailer": "^5.1.1",
